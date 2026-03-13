@@ -1,0 +1,655 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXContainerItemProxy section */
+		9F7F94732F637CB7001CA245 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 9F7F945D2F637CAF001CA245 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 9F7F94642F637CAF001CA245;
+			remoteInfo = GoogleClassRoom;
+		};
+		9F7F947D2F637CB7001CA245 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 9F7F945D2F637CAF001CA245 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 9F7F94642F637CAF001CA245;
+			remoteInfo = GoogleClassRoom;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		9F7F94652F637CAF001CA245 /* GoogleClassRoom.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GoogleClassRoom.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		9F7F94722F637CB7001CA245 /* GoogleClassRoomTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = GoogleClassRoomTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		9F7F947C2F637CB7001CA245 /* GoogleClassRoomUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = GoogleClassRoomUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		9F7F94FF2F6391A8001CA245 /* Exceptions for "GoogleClassRoom" folder in "GoogleClassRoom" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 9F7F94642F637CAF001CA245 /* GoogleClassRoom */;
+		};
+		9FDC93E22F63E22F006FC94F /* Exceptions for "GoogleClassRoom" folder in "GoogleClassRoomTests" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				ContentView.swift,
+				GoogleClassRoomApp.swift,
+				Models/AuthModels.swift,
+				Models/CommentModels.swift,
+				Models/CourseModels.swift,
+				Models/PostModels.swift,
+				Models/SolutionModels.swift,
+				Models/UserModels.swift,
+				Network/APIClient.swift,
+				Network/APIError.swift,
+				Network/TokenStorage.swift,
+				Services/Auth/AuthService.swift,
+				Services/Auth/AuthServiceProtocol.swift,
+				Services/Comment/CommentService.swift,
+				Services/Comment/CommentServiceProtocol.swift,
+				Services/Course/CourseService.swift,
+				Services/Course/CourseServiceProtocol.swift,
+				Services/File/FileService.swift,
+				Services/File/FileServiceProtocol.swift,
+				Services/Post/PostService.swift,
+				Services/Post/PostServiceProtocol.swift,
+				Services/ServiceLocator.swift,
+				Services/Solutions/SolutionService.swift,
+				Services/Solutions/SolutionServiceProtocol.swift,
+				Services/User/UserService.swift,
+				Services/User/UserServiceProtocol.swift,
+				ViewModels/AnalyticsViewModel.swift,
+				ViewModels/AuthViewModel.swift,
+				ViewModels/CourseFeedViewModel.swift,
+				ViewModels/CourseListViewModel.swift,
+				ViewModels/CourseMembersViewModel.swift,
+				ViewModels/CreatePostViewModel.swift,
+				ViewModels/PostDetailViewModel.swift,
+				ViewModels/ProfileViewModel.swift,
+				ViewModels/ReviewSolutionViewModel.swift,
+				ViewModels/SolutionViewModel.swift,
+				Views/Analytics/AnalyticsView.swift,
+				Views/Auth/LoginView.swift,
+				Views/Auth/RegisterView.swift,
+				Views/Course/CourseMembersView.swift,
+				Views/Courses/CourseListView.swift,
+				Views/Courses/CreateCourseView.swift,
+				Views/Courses/JoinCourseView.swift,
+				Views/Feed/CourseFeedView.swift,
+				Views/MainTabView.swift,
+				Views/Posts/CreatePostView.swift,
+				Views/Posts/PostDetailView.swift,
+				Views/Profile/ProfileView.swift,
+				Views/Solutions/ReviewSolutionView.swift,
+				Views/Solutions/SolutionView.swift,
+			);
+			target = 9F7F94712F637CB7001CA245 /* GoogleClassRoomTests */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		9F7F94672F637CAF001CA245 /* GoogleClassRoom */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				9F7F94FF2F6391A8001CA245 /* Exceptions for "GoogleClassRoom" folder in "GoogleClassRoom" target */,
+				9FDC93E22F63E22F006FC94F /* Exceptions for "GoogleClassRoom" folder in "GoogleClassRoomTests" target */,
+			);
+			path = GoogleClassRoom;
+			sourceTree = "<group>";
+		};
+		9F7F94752F637CB7001CA245 /* GoogleClassRoomTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = GoogleClassRoomTests;
+			sourceTree = "<group>";
+		};
+		9F7F947F2F637CB7001CA245 /* GoogleClassRoomUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = GoogleClassRoomUITests;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		9F7F94622F637CAF001CA245 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9F7F946F2F637CB7001CA245 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9F7F94792F637CB7001CA245 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		9F7F945C2F637CAF001CA245 = {
+			isa = PBXGroup;
+			children = (
+				9F7F94672F637CAF001CA245 /* GoogleClassRoom */,
+				9F7F94752F637CB7001CA245 /* GoogleClassRoomTests */,
+				9F7F947F2F637CB7001CA245 /* GoogleClassRoomUITests */,
+				9F7F94662F637CAF001CA245 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		9F7F94662F637CAF001CA245 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				9F7F94652F637CAF001CA245 /* GoogleClassRoom.app */,
+				9F7F94722F637CB7001CA245 /* GoogleClassRoomTests.xctest */,
+				9F7F947C2F637CB7001CA245 /* GoogleClassRoomUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		9F7F94642F637CAF001CA245 /* GoogleClassRoom */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 9F7F94862F637CB7001CA245 /* Build configuration list for PBXNativeTarget "GoogleClassRoom" */;
+			buildPhases = (
+				9F7F94612F637CAF001CA245 /* Sources */,
+				9F7F94622F637CAF001CA245 /* Frameworks */,
+				9F7F94632F637CAF001CA245 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				9F7F94672F637CAF001CA245 /* GoogleClassRoom */,
+			);
+			name = GoogleClassRoom;
+			packageProductDependencies = (
+			);
+			productName = GoogleClassRoom;
+			productReference = 9F7F94652F637CAF001CA245 /* GoogleClassRoom.app */;
+			productType = "com.apple.product-type.application";
+		};
+		9F7F94712F637CB7001CA245 /* GoogleClassRoomTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 9F7F94892F637CB7001CA245 /* Build configuration list for PBXNativeTarget "GoogleClassRoomTests" */;
+			buildPhases = (
+				9F7F946E2F637CB7001CA245 /* Sources */,
+				9F7F946F2F637CB7001CA245 /* Frameworks */,
+				9F7F94702F637CB7001CA245 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				9F7F94742F637CB7001CA245 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				9F7F94752F637CB7001CA245 /* GoogleClassRoomTests */,
+			);
+			name = GoogleClassRoomTests;
+			packageProductDependencies = (
+			);
+			productName = GoogleClassRoomTests;
+			productReference = 9F7F94722F637CB7001CA245 /* GoogleClassRoomTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		9F7F947B2F637CB7001CA245 /* GoogleClassRoomUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 9F7F948C2F637CB7001CA245 /* Build configuration list for PBXNativeTarget "GoogleClassRoomUITests" */;
+			buildPhases = (
+				9F7F94782F637CB7001CA245 /* Sources */,
+				9F7F94792F637CB7001CA245 /* Frameworks */,
+				9F7F947A2F637CB7001CA245 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				9F7F947E2F637CB7001CA245 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				9F7F947F2F637CB7001CA245 /* GoogleClassRoomUITests */,
+			);
+			name = GoogleClassRoomUITests;
+			packageProductDependencies = (
+			);
+			productName = GoogleClassRoomUITests;
+			productReference = 9F7F947C2F637CB7001CA245 /* GoogleClassRoomUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		9F7F945D2F637CAF001CA245 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 2620;
+				LastUpgradeCheck = 2620;
+				TargetAttributes = {
+					9F7F94642F637CAF001CA245 = {
+						CreatedOnToolsVersion = 26.2;
+					};
+					9F7F94712F637CB7001CA245 = {
+						CreatedOnToolsVersion = 26.2;
+						TestTargetID = 9F7F94642F637CAF001CA245;
+					};
+					9F7F947B2F637CB7001CA245 = {
+						CreatedOnToolsVersion = 26.2;
+						TestTargetID = 9F7F94642F637CAF001CA245;
+					};
+				};
+			};
+			buildConfigurationList = 9F7F94602F637CAF001CA245 /* Build configuration list for PBXProject "GoogleClassRoom" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 9F7F945C2F637CAF001CA245;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 9F7F94662F637CAF001CA245 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				9F7F94642F637CAF001CA245 /* GoogleClassRoom */,
+				9F7F94712F637CB7001CA245 /* GoogleClassRoomTests */,
+				9F7F947B2F637CB7001CA245 /* GoogleClassRoomUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		9F7F94632F637CAF001CA245 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9F7F94702F637CB7001CA245 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9F7F947A2F637CB7001CA245 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		9F7F94612F637CAF001CA245 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9F7F946E2F637CB7001CA245 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9F7F94782F637CB7001CA245 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		9F7F94742F637CB7001CA245 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 9F7F94642F637CAF001CA245 /* GoogleClassRoom */;
+			targetProxy = 9F7F94732F637CB7001CA245 /* PBXContainerItemProxy */;
+		};
+		9F7F947E2F637CB7001CA245 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 9F7F94642F637CAF001CA245 /* GoogleClassRoom */;
+			targetProxy = 9F7F947D2F637CB7001CA245 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		9F7F94842F637CB7001CA245 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = TDMHGP7XAD;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		9F7F94852F637CB7001CA245 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = TDMHGP7XAD;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		9F7F94872F637CB7001CA245 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = TDMHGP7XAD;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = GoogleClassRoom/Info.plist;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.Gleb.GoogleClassRoom;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		9F7F94882F637CB7001CA245 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = TDMHGP7XAD;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = GoogleClassRoom/Info.plist;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.Gleb.GoogleClassRoom;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		9F7F948A2F637CB7001CA245 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = TDMHGP7XAD;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.Gleb.GoogleClassRoomTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/GoogleClassRoom.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/GoogleClassRoom";
+			};
+			name = Debug;
+		};
+		9F7F948B2F637CB7001CA245 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = TDMHGP7XAD;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.Gleb.GoogleClassRoomTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/GoogleClassRoom.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/GoogleClassRoom";
+			};
+			name = Release;
+		};
+		9F7F948D2F637CB7001CA245 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = TDMHGP7XAD;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.Gleb.GoogleClassRoomUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = GoogleClassRoom;
+			};
+			name = Debug;
+		};
+		9F7F948E2F637CB7001CA245 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = TDMHGP7XAD;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.Gleb.GoogleClassRoomUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = GoogleClassRoom;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		9F7F94602F637CAF001CA245 /* Build configuration list for PBXProject "GoogleClassRoom" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9F7F94842F637CB7001CA245 /* Debug */,
+				9F7F94852F637CB7001CA245 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		9F7F94862F637CB7001CA245 /* Build configuration list for PBXNativeTarget "GoogleClassRoom" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9F7F94872F637CB7001CA245 /* Debug */,
+				9F7F94882F637CB7001CA245 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		9F7F94892F637CB7001CA245 /* Build configuration list for PBXNativeTarget "GoogleClassRoomTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9F7F948A2F637CB7001CA245 /* Debug */,
+				9F7F948B2F637CB7001CA245 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		9F7F948C2F637CB7001CA245 /* Build configuration list for PBXNativeTarget "GoogleClassRoomUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9F7F948D2F637CB7001CA245 /* Debug */,
+				9F7F948E2F637CB7001CA245 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 9F7F945D2F637CAF001CA245 /* Project object */;
+}
