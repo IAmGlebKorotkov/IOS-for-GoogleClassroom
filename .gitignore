@@ -1,0 +1,42 @@
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+xcuserdata/
+*.xcodeproj/xcuserdata/
+*.xcworkspace/xcuserdata/
+*.xcodeproj/project.xcworkspace/
+*.xcworkspace/
+*.mode1v3
+*.mode2v3
+*.perspectivev3
+*.pbxuser
+*.perspectivev3
+*.xcuserstate
+
+.build/
+Packages/
+*.swiftpm
+
+Pods/
+Podfile.lock
+
+Carthage/Build
+
+# Fastlane
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots
+fastlane/test_output
+
+# Generated files
+*.generated.swift
+
+# Dependencies
+DerivedData/
+.DS_Store
+**/.DS_Store
