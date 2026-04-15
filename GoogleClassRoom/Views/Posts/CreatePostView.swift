@@ -14,6 +14,15 @@ struct CreatePostView: View {
     @State private var taskType: TaskType = .mandatory
     @State private var solvableAfterDeadline = false
     @State private var showFilePicker = false
+    // Team task
+    @State private var minTeamSize = 2
+    @State private var maxTeamSize = 4
+    @State private var captainMode: CaptainSelectionMode = .firstMember
+    @State private var votingDurationHours = 24
+    @State private var predefinedTeamsCount = 0
+    @State private var allowJoinTeam = true
+    @State private var allowLeaveTeam = true
+    @State private var allowStudentTransferCaptain = false
 
     init(courseId: UUID) {
         _vm = StateObject(wrappedValue: CreatePostViewModel(courseId: courseId))
@@ -24,8 +33,9 @@ struct CreatePostView: View {
             Form {
                 Section("Тип публикации") {
                     Picker("Тип", selection: $type) {
-                        Text("Объявление / Материал").tag(PostType.post)
+                        Text("Материал").tag(PostType.post)
                         Text("Задание").tag(PostType.task)
+                        Text("Командное").tag(PostType.teamTask)
                     }
                     .pickerStyle(.segmented)
                 }
@@ -36,7 +46,7 @@ struct CreatePostView: View {
                         .lineLimit(3...8)
                 }
 
-                if type == .task {
+                if type == .task || type == .teamTask {
                     Section("Параметры задания") {
                         Picker("Тип задания", selection: $taskType) {
                             Text("Обязательное").tag(TaskType.mandatory)
@@ -56,6 +66,31 @@ struct CreatePostView: View {
                         }
 
                         Toggle("Можно сдавать после дедлайна", isOn: $solvableAfterDeadline)
+                    }
+                }
+
+                if type == .teamTask {
+                    Section("Параметры команд") {
+                        Stepper("Мин. размер команды: \(minTeamSize)", value: $minTeamSize, in: 1...20)
+                        Stepper("Макс. размер команды: \(maxTeamSize)", value: $maxTeamSize, in: 1...50)
+                        Stepper("Предопределённых команд: \(predefinedTeamsCount)", value: $predefinedTeamsCount, in: 0...30)
+                    }
+
+                    Section("Капитан") {
+                        Picker("Выбор капитана", selection: $captainMode) {
+                            Text("Первый участник").tag(CaptainSelectionMode.firstMember)
+                            Text("Голосование").tag(CaptainSelectionMode.votingAndLottery)
+                            Text("Назначает учитель").tag(CaptainSelectionMode.teacherFixed)
+                        }
+                        if captainMode == .votingAndLottery {
+                            Stepper("Голосование: \(votingDurationHours) ч.", value: $votingDurationHours, in: 1...168)
+                        }
+                        Toggle("Студент может передать капитанство", isOn: $allowStudentTransferCaptain)
+                    }
+
+                    Section("Управление командой") {
+                        Toggle("Студент может вступить в команду", isOn: $allowJoinTeam)
+                        Toggle("Студент может покинуть команду", isOn: $allowLeaveTeam)
                     }
                 }
 
@@ -121,7 +156,15 @@ struct CreatePostView: View {
                                 deadline: hasDeadline ? deadline : nil,
                                 maxScore: maxScore,
                                 taskType: taskType,
-                                solvableAfterDeadline: solvableAfterDeadline
+                                solvableAfterDeadline: solvableAfterDeadline,
+                                minTeamSize: type == .teamTask ? minTeamSize : nil,
+                                maxTeamSize: type == .teamTask ? maxTeamSize : nil,
+                                captainMode: type == .teamTask ? captainMode : nil,
+                                votingDurationHours: type == .teamTask && captainMode == .votingAndLottery ? votingDurationHours : nil,
+                                predefinedTeamsCount: type == .teamTask && predefinedTeamsCount > 0 ? predefinedTeamsCount : nil,
+                                allowJoinTeam: type == .teamTask ? allowJoinTeam : nil,
+                                allowLeaveTeam: type == .teamTask ? allowLeaveTeam : nil,
+                                allowStudentTransferCaptain: type == .teamTask ? allowStudentTransferCaptain : nil
                             )
                             if success { dismiss() }
                         }

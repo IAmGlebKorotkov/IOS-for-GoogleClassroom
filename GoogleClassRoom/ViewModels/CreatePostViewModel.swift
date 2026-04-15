@@ -42,13 +42,21 @@ final class CreatePostViewModel: ObservableObject {
         deadline: Date?,
         maxScore: Int,
         taskType: TaskType,
-        solvableAfterDeadline: Bool
+        solvableAfterDeadline: Bool,
+        minTeamSize: Int? = nil,
+        maxTeamSize: Int? = nil,
+        captainMode: CaptainSelectionMode? = nil,
+        votingDurationHours: Int? = nil,
+        predefinedTeamsCount: Int? = nil,
+        allowJoinTeam: Bool? = nil,
+        allowLeaveTeam: Bool? = nil,
+        allowStudentTransferCaptain: Bool? = nil
     ) async -> Bool {
         guard PostValidator.isValidTitle(title) else {
             errorMessage = "Введите заголовок"
             return false
         }
-        if type == .task {
+        if type == .task || type == .teamTask {
             guard PostValidator.isValidMaxScore(maxScore) else {
                 errorMessage = "Максимальный балл должен быть больше 0"
                 return false
@@ -65,15 +73,24 @@ final class CreatePostViewModel: ObservableObject {
         defer { isLoading = false }
         do {
             let fileIds = uploadedFiles.isEmpty ? nil : uploadedFiles.map { $0.id }
+            let isTaskOrTeamTask = type == .task || type == .teamTask
             let request = CreatePostRequest(
                 type: type,
                 title: title,
                 text: text.isEmpty ? nil : text,
-                deadline: type == .task ? deadline : nil,
-                maxScore: type == .task ? maxScore : nil,
-                taskType: type == .task ? taskType : nil,
-                solvableAfterDeadline: type == .task ? solvableAfterDeadline : nil,
-                files: fileIds
+                deadline: isTaskOrTeamTask ? deadline : nil,
+                maxScore: isTaskOrTeamTask ? maxScore : nil,
+                taskType: isTaskOrTeamTask ? taskType : nil,
+                solvableAfterDeadline: isTaskOrTeamTask ? solvableAfterDeadline : nil,
+                files: fileIds,
+                minTeamSize: type == .teamTask ? minTeamSize : nil,
+                maxTeamSize: type == .teamTask ? maxTeamSize : nil,
+                captainMode: type == .teamTask ? captainMode : nil,
+                votingDurationHours: type == .teamTask ? votingDurationHours : nil,
+                predefinedTeamsCount: type == .teamTask ? predefinedTeamsCount : nil,
+                allowJoinTeam: type == .teamTask ? allowJoinTeam : nil,
+                allowLeaveTeam: type == .teamTask ? allowLeaveTeam : nil,
+                allowStudentTransferCaptain: type == .teamTask ? allowStudentTransferCaptain : nil
             )
             _ = try await service.createPost(courseId: courseId, request: request)
             return true

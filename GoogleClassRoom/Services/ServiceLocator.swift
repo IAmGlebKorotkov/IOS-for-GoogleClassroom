@@ -12,4 +12,7 @@ final class ServiceLocator {
     lazy var commentService: CommentServiceProtocol = CommentService()
     lazy var userService: UserServiceProtocol = UserService()
     lazy var fileService: FileServiceProtocol = FileService()
+    lazy var teamService: TeamServiceProtocol = TeamService()
+    lazy var teamTaskService: TeamTaskServiceProtocol = TeamTaskService()
+    lazy var gradeDistributionService: GradeDistributionServiceProtocol = GradeDistributionService()
 }

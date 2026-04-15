@@ -3,6 +3,13 @@ import Foundation
 enum PostType: String, Codable, Hashable {
     case post
     case task
+    case teamTask = "teaM_TASK"
+}
+
+enum CaptainSelectionMode: String, Codable {
+    case firstMember
+    case teacherFixed
+    case votingAndLottery
 }
 
 enum TaskType: String, Codable {
@@ -24,6 +31,15 @@ struct CreatePostRequest: Codable {
     let taskType: TaskType?
     let solvableAfterDeadline: Bool?
     let files: [UUID]?
+    // Team task fields
+    let minTeamSize: Int?
+    let maxTeamSize: Int?
+    let captainMode: CaptainSelectionMode?
+    let votingDurationHours: Int?
+    let predefinedTeamsCount: Int?
+    let allowJoinTeam: Bool?
+    let allowLeaveTeam: Bool?
+    let allowStudentTransferCaptain: Bool?
 }
 
 struct PostDetailsDto: Codable {

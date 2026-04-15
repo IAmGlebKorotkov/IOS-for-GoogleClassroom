@@ -113,15 +113,29 @@ final class APIClient {
         switch http.statusCode {
         case 200...299: return
         case 401: throw APIError.unauthorized
-        case 403: throw APIError.forbidden
+        case 403:
+            if let msg = serverMessage(from: data), !msg.isEmpty {
+                throw APIError.serverError(msg)
+            }
+            throw APIError.forbidden
         case 404: throw APIError.notFound
         default:
-            if let apiResp = try? decoder.decode(ApiResponse<String?>.self, from: data),
-               let msg = apiResp.message {
+            if let msg = serverMessage(from: data), !msg.isEmpty {
                 throw APIError.serverError(msg)
             }
             throw APIError.serverError("HTTP \(http.statusCode)")
         }
+    }
+
+    private func serverMessage(from data: Data) -> String? {
+        if let apiResp = try? decoder.decode(ApiResponse<String?>.self, from: data),
+           let msg = apiResp.message {
+            return msg
+        }
+        if let text = String(data: data, encoding: .utf8), !text.isEmpty {
+            return text
+        }
+        return nil
     }
 
     private func decode<T: Decodable>(_ type: T.Type, from data: Data) throws -> T {

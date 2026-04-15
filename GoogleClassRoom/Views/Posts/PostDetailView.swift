@@ -6,6 +6,7 @@ struct PostDetailView: View {
     @StateObject private var vm: PostDetailViewModel
     @State private var commentText = ""
     @State private var showSolution = false
+    @State private var showTeamSolution = false
     @FocusState private var commentFocused: Bool
 
     let title: String
@@ -24,7 +25,7 @@ struct PostDetailView: View {
                 if let post = vm.post {
                     PostBodyView(post: post)
 
-                    
+                    // Regular task actions
                     if post.type == .task {
                         if role == .student {
                             Button {
@@ -50,6 +51,54 @@ struct PostDetailView: View {
                                     .cornerRadius(12)
                             }
                             .padding(.horizontal)
+                        }
+                    }
+
+                    // Team task actions
+                    if post.type == .teamTask {
+                        VStack(spacing: 10) {
+                            NavigationLink {
+                                TeamTaskView(
+                                    assignmentId: vm.postId,
+                                    role: role,
+                                    taskTitle: post.title,
+                                    maxScore: post.maxScore
+                                )
+                            } label: {
+                                Label("Команды", systemImage: "person.3.fill")
+                                    .frame(maxWidth: .infinity)
+                                    .padding()
+                                    .background(Color.blue.opacity(0.15))
+                                    .foregroundStyle(.blue)
+                                    .cornerRadius(12)
+                            }
+                            .padding(.horizontal)
+
+                            if role == .student {
+                                Button {
+                                    showTeamSolution = true
+                                } label: {
+                                    Label("Командное решение", systemImage: "tray.and.arrow.up")
+                                        .frame(maxWidth: .infinity)
+                                        .padding()
+                                        .background(.blue)
+                                        .foregroundStyle(.white)
+                                        .cornerRadius(12)
+                                }
+                                .padding(.horizontal)
+                            } else {
+                                NavigationLink {
+                                    ReviewTeamSolutionView(taskId: vm.postId, maxScore: post.maxScore)
+                                } label: {
+                                    Label("Решения команд", systemImage: "person.text.rectangle")
+                                        .frame(maxWidth: .infinity)
+                                        .padding()
+                                        .background(.orange)
+                                        .foregroundStyle(.white)
+                                        .cornerRadius(12)
+                                }
+                                .padding(.horizontal)
+                            }
                         }
                     }
                 } else if vm.isLoading {
@@ -105,6 +154,11 @@ struct PostDetailView: View {
         .sheet(isPresented: $showSolution) {
             if let post = vm.post {
                 SolutionView(taskId: vm.postId, maxScore: post.maxScore)
+            }
+        }
+        .sheet(isPresented: $showTeamSolution) {
+            if let post = vm.post {
+                TeamSolutionView(taskId: vm.postId, maxScore: post.maxScore)
             }
         }
         .task { await vm.load() }

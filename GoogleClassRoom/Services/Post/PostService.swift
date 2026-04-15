@@ -12,7 +12,15 @@ final class PostService: PostServiceProtocol {
             maxScore: request.maxScore,
             taskType: request.taskType,
             solvableAfterDeadline: request.solvableAfterDeadline,
-            files: request.files
+            files: request.files,
+            minTeamSize: request.minTeamSize,
+            maxTeamSize: request.maxTeamSize,
+            captainMode: request.captainMode,
+            votingDurationHours: request.votingDurationHours,
+            predefinedTeamsCount: request.predefinedTeamsCount,
+            allowJoinTeam: request.allowJoinTeam,
+            allowLeaveTeam: request.allowLeaveTeam,
+            allowStudentTransferCaptain: request.allowStudentTransferCaptain
         )
         let response: ApiResponse<IdRequestDto> = try await client.request(
             path: "/api/course/\(courseId.uuidString)/task",
@@ -36,7 +44,15 @@ final class PostService: PostServiceProtocol {
             maxScore: request.maxScore,
             taskType: request.taskType,
             solvableAfterDeadline: request.solvableAfterDeadline,
-            files: request.files
+            files: request.files,
+            minTeamSize: request.minTeamSize,
+            maxTeamSize: request.maxTeamSize,
+            captainMode: request.captainMode,
+            votingDurationHours: request.votingDurationHours,
+            predefinedTeamsCount: request.predefinedTeamsCount,
+            allowJoinTeam: request.allowJoinTeam,
+            allowLeaveTeam: request.allowLeaveTeam,
+            allowStudentTransferCaptain: request.allowStudentTransferCaptain
         )
         let response: ApiResponse<IdRequestDto> = try await client.request(
             path: "/api/post/\(id.uuidString)",
@@ -81,4 +97,12 @@ private struct CreateUpdatePostDto: Encodable {
     let taskType: TaskType?
     let solvableAfterDeadline: Bool?
     let files: [UUID]?
+    let minTeamSize: Int?
+    let maxTeamSize: Int?
+    let captainMode: CaptainSelectionMode?
+    let votingDurationHours: Int?
+    let predefinedTeamsCount: Int?
+    let allowJoinTeam: Bool?
+    let allowLeaveTeam: Bool?
+    let allowStudentTransferCaptain: Bool?
 }

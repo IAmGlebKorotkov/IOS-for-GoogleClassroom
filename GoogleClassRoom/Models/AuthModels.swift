@@ -16,9 +16,30 @@ struct UserChangePasswordRequest: Codable {
     let newPassword: String?
 }
 
-enum ApiResponseType: String, Codable {
+enum ApiResponseType: Codable {
     case success
     case error
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        if let intValue = try? container.decode(Int.self) {
+            self = (intValue == 0) ? .success : .error
+            return
+        }
+        let stringValue = try container.decode(String.self)
+        switch stringValue.lowercased() {
+        case "success", "0": self = .success
+        default: self = .error
+        }
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        switch self {
+        case .success: try container.encode("success")
+        case .error: try container.encode("error")
+        }
+    }
 }
 
 struct ApiResponse<T: Codable>: Codable {

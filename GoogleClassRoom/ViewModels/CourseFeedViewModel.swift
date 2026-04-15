@@ -7,6 +7,7 @@ import Combine
 final class CourseFeedViewModel: ObservableObject {
 
     @Published var items: [CourseFeedItemDto] = []
+    @Published var inviteCode: String?
     @Published var isLoading = false
     @Published var errorMessage: String?
 
@@ -36,6 +37,7 @@ final class CourseFeedViewModel: ObservableObject {
             currentSkip = 0
             hasMore = true
             items = []
+            await loadCourseDetails()
         }
         guard hasMore else { return }
         isLoading = true
@@ -55,6 +57,15 @@ final class CourseFeedViewModel: ObservableObject {
             errorMessage = e.localizedDescription
         } catch {
             errorMessage = error.localizedDescription
+        }
+    }
+
+    private func loadCourseDetails() async {
+        do {
+            let response = try await courseService.getCourse(id: courseId)
+            inviteCode = response.data?.inviteCode
+        } catch {
+            // Не критично — просто не покажем код
         }
     }
 }
