@@ -7,6 +7,7 @@ final class MockPostService: PostServiceProtocol {
 
     
     var createPostError: Error?
+    var updatePostError: Error?
     var deletePostError: Error?
     var getFeedError: Error?
 
@@ -17,9 +18,12 @@ final class MockPostService: PostServiceProtocol {
 
     
     var createCallCount = 0
+    var updateCallCount = 0
     var deleteCallCount = 0
     var getFeedCallCount = 0
     var lastCreatedRequest: CreatePostRequest?
+    var lastUpdatedRequest: CreatePostRequest?
+    var lastUpdatedPostId: UUID?
     var lastDeletedPostId: UUID?
 
     func createPost(courseId: UUID, request: CreatePostRequest) async throws -> ApiResponse<IdDto> {
@@ -46,6 +50,10 @@ final class MockPostService: PostServiceProtocol {
     }
 
     func updatePost(id: UUID, request: CreatePostRequest) async throws -> ApiResponse<IdDto> {
+        updateCallCount += 1
+        lastUpdatedPostId = id
+        lastUpdatedRequest = request
+        if let error = updatePostError { throw error }
         return ApiResponse(type: .success, message: nil, data: IdDto(id: id))
     }
 

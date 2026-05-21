@@ -5,11 +5,17 @@ private struct UpdateSolutionRequestDto: Encodable {
     let score: Int?
     let status: SolutionStatus
     let comment: String?
+    let evaluation: EvaluationDto?
 }
 
 private struct SubmitSolutionRequestDto: Encodable {
     let text: String?
     let files: [UUID]?
+    let selfAssessment: EvaluationDto?
+}
+
+private struct SubmitSelfAssessmentDto: Encodable {
+    let evaluation: EvaluationDto
 }
 
 private struct IdRequestDto: Codable {
@@ -20,7 +26,11 @@ final class SolutionService: SolutionServiceProtocol {
     private let client = APIClient.shared
 
     func submitSolution(taskId: UUID, request: SubmitSolutionRequest) async throws -> ApiResponse<IdDto> {
-        let body = SubmitSolutionRequestDto(text: request.text, files: request.files)
+        let body = SubmitSolutionRequestDto(
+            text: request.text,
+            files: request.files,
+            selfAssessment: request.selfAssessment
+        )
         let response: ApiResponse<IdRequestDto> = try await client.request(
             path: "/api/task/\(taskId.uuidString)/solution",
             method: .put,
@@ -57,8 +67,33 @@ final class SolutionService: SolutionServiceProtocol {
         )
     }
 
+    func submitSelfAssessment(taskId: UUID, evaluation: EvaluationDto) async throws -> ApiResponse<IdDto> {
+        let body = SubmitSelfAssessmentDto(evaluation: evaluation)
+        let response: ApiResponse<IdRequestDto> = try await client.request(
+            path: "/api/task/\(taskId.uuidString)/self-assessment",
+            method: .put,
+            body: body
+        )
+        let idDto = response.data.map { IdDto(id: $0.id) }
+        return ApiResponse(type: response.type, message: response.message, data: idDto)
+    }
+
+    func deleteSelfAssessment(taskId: UUID) async throws -> ApiResponse<IdDto> {
+        let response: ApiResponse<IdRequestDto> = try await client.request(
+            path: "/api/task/\(taskId.uuidString)/self-assessment",
+            method: .delete
+        )
+        let idDto = response.data.map { IdDto(id: $0.id) }
+        return ApiResponse(type: response.type, message: response.message, data: idDto)
+    }
+
     func reviewSolution(solutionId: UUID, request: ReviewSolutionRequest) async throws -> ApiResponse<IdDto> {
-        let body = UpdateSolutionRequestDto(score: request.score, status: request.status, comment: request.comment)
+        let body = UpdateSolutionRequestDto(
+            score: request.score,
+            status: request.status,
+            comment: request.comment,
+            evaluation: request.evaluation
+        )
         let response: ApiResponse<IdRequestDto> = try await client.request(
             path: "/api/solution/\(solutionId.uuidString)/review",
             method: .post,
@@ -66,5 +101,14 @@ final class SolutionService: SolutionServiceProtocol {
         )
         let idDto = response.data.map { IdDto(id: $0.id) }
         return ApiResponse(type: response.type, message: response.message, data: idDto)
+    }
+
+    func previewGrade(solutionId: UUID, evaluation: EvaluationDto) async throws -> ApiResponse<GradeBreakdownDto> {
+        let body = GradePreviewRequestDto(evaluation: evaluation)
+        return try await client.request(
+            path: "/api/solution/\(solutionId.uuidString)/preview",
+            method: .post,
+            body: body
+        )
     }
 }

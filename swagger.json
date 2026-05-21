@@ -88,7 +88,7 @@
         },
         "security": [
           {
-            "bearerAuth": [ ]
+            "bearerAuth": []
           }
         ]
       }
@@ -233,7 +233,7 @@
         },
         "security": [
           {
-            "bearerAuth": [ ]
+            "bearerAuth": []
           }
         ]
       }
@@ -303,7 +303,7 @@
         },
         "security": [
           {
-            "bearerAuth": [ ]
+            "bearerAuth": []
           }
         ]
       },
@@ -352,7 +352,7 @@
         },
         "security": [
           {
-            "bearerAuth": [ ]
+            "bearerAuth": []
           }
         ]
       }
@@ -422,7 +422,7 @@
         },
         "security": [
           {
-            "bearerAuth": [ ]
+            "bearerAuth": []
           }
         ]
       },
@@ -471,7 +471,7 @@
         },
         "security": [
           {
-            "bearerAuth": [ ]
+            "bearerAuth": []
           }
         ]
       }
@@ -522,7 +522,7 @@
         },
         "security": [
           {
-            "bearerAuth": [ ]
+            "bearerAuth": []
           }
         ]
       }
@@ -592,7 +592,7 @@
         },
         "security": [
           {
-            "bearerAuth": [ ]
+            "bearerAuth": []
           }
         ]
       }
@@ -662,7 +662,7 @@
         },
         "security": [
           {
-            "bearerAuth": [ ]
+            "bearerAuth": []
           }
         ]
       },
@@ -711,7 +711,7 @@
         },
         "security": [
           {
-            "bearerAuth": [ ]
+            "bearerAuth": []
           }
         ]
       }
@@ -770,7 +770,7 @@
         },
         "security": [
           {
-            "bearerAuth": [ ]
+            "bearerAuth": []
           }
         ]
       }
@@ -840,7 +840,7 @@
         },
         "security": [
           {
-            "bearerAuth": [ ]
+            "bearerAuth": []
           }
         ]
       },
@@ -889,7 +889,7 @@
         },
         "security": [
           {
-            "bearerAuth": [ ]
+            "bearerAuth": []
           }
         ]
       }
@@ -965,7 +965,7 @@
         },
         "security": [
           {
-            "bearerAuth": [ ]
+            "bearerAuth": []
           }
         ]
       }
@@ -1044,7 +1044,7 @@
         },
         "security": [
           {
-            "bearerAuth": [ ]
+            "bearerAuth": []
           }
         ]
       }
@@ -1104,7 +1104,7 @@
         },
         "security": [
           {
-            "bearerAuth": [ ]
+            "bearerAuth": []
           }
         ]
       }
@@ -1155,7 +1155,7 @@
         },
         "security": [
           {
-            "bearerAuth": [ ]
+            "bearerAuth": []
           }
         ]
       }
@@ -1214,7 +1214,7 @@
         },
         "security": [
           {
-            "bearerAuth": [ ]
+            "bearerAuth": []
           }
         ]
       }
@@ -1274,7 +1274,7 @@
         },
         "security": [
           {
-            "bearerAuth": [ ]
+            "bearerAuth": []
           }
         ]
       }
@@ -1334,7 +1334,7 @@
         },
         "security": [
           {
-            "bearerAuth": [ ]
+            "bearerAuth": []
           }
         ]
       }
@@ -1417,7 +1417,7 @@
         },
         "security": [
           {
-            "bearerAuth": [ ]
+            "bearerAuth": []
           }
         ]
       },
@@ -1514,7 +1514,7 @@
         },
         "security": [
           {
-            "bearerAuth": [ ]
+            "bearerAuth": []
           }
         ]
       }
@@ -1596,7 +1596,7 @@
         },
         "security": [
           {
-            "bearerAuth": [ ]
+            "bearerAuth": []
           }
         ]
       }
@@ -1666,7 +1666,7 @@
         },
         "security": [
           {
-            "bearerAuth": [ ]
+            "bearerAuth": []
           }
         ]
       }
@@ -1717,7 +1717,7 @@
         },
         "security": [
           {
-            "bearerAuth": [ ]
+            "bearerAuth": []
           }
         ]
       },
@@ -1785,7 +1785,7 @@
         },
         "security": [
           {
-            "bearerAuth": [ ]
+            "bearerAuth": []
           }
         ]
       },
@@ -1834,7 +1834,7 @@
         },
         "security": [
           {
-            "bearerAuth": [ ]
+            "bearerAuth": []
           }
         ]
       }
@@ -1903,7 +1903,7 @@
         },
         "security": [
           {
-            "bearerAuth": [ ]
+            "bearerAuth": []
           }
         ]
       }
@@ -1973,7 +1973,7 @@
         },
         "security": [
           {
-            "bearerAuth": [ ]
+            "bearerAuth": []
           }
         ]
       },
@@ -2022,7 +2022,7 @@
         },
         "security": [
           {
-            "bearerAuth": [ ]
+            "bearerAuth": []
           }
         ]
       },
@@ -2071,7 +2071,7 @@
         },
         "security": [
           {
-            "bearerAuth": [ ]
+            "bearerAuth": []
           }
         ]
       }
@@ -2155,7 +2155,7 @@
         },
         "security": [
           {
-            "bearerAuth": [ ]
+            "bearerAuth": []
           }
         ]
       }
@@ -2225,7 +2225,196 @@
         },
         "security": [
           {
-            "bearerAuth": [ ]
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/solution/{solutionId}/preview": {
+      "post": {
+        "tags": [
+          "Solution"
+        ],
+        "parameters": [
+          {
+            "name": "solutionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GradePreviewRequestDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GradePreviewRequestDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/GradePreviewRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/GradeBreakdownDtoApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GradeBreakdownDtoApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GradeBreakdownDtoApiResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/task/{taskId}/self-assessment": {
+      "put": {
+        "tags": [
+          "Solution"
+        ],
+        "parameters": [
+          {
+            "name": "taskId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubmitSelfAssessmentDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubmitSelfAssessmentDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubmitSelfAssessmentDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/IdRequestDtoApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IdRequestDtoApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IdRequestDtoApiResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Solution"
+        ],
+        "parameters": [
+          {
+            "name": "taskId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/IdRequestDtoApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IdRequestDtoApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IdRequestDtoApiResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
           }
         ]
       }
@@ -2276,7 +2465,7 @@
         },
         "security": [
           {
-            "bearerAuth": [ ]
+            "bearerAuth": []
           }
         ]
       }
@@ -2327,7 +2516,7 @@
         },
         "security": [
           {
-            "bearerAuth": [ ]
+            "bearerAuth": []
           }
         ]
       }
@@ -2387,7 +2576,7 @@
         },
         "security": [
           {
-            "bearerAuth": [ ]
+            "bearerAuth": []
           }
         ]
       }
@@ -2432,9 +2621,37 @@
         },
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObjectApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObjectApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObjectApiResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
           }
-        }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     },
     "/api/teacher/teams/{teamId}/rename": {
@@ -2502,7 +2719,7 @@
         },
         "security": [
           {
-            "bearerAuth": [ ]
+            "bearerAuth": []
           }
         ]
       }
@@ -2553,7 +2770,7 @@
         },
         "security": [
           {
-            "bearerAuth": [ ]
+            "bearerAuth": []
           }
         ]
       }
@@ -2613,7 +2830,7 @@
         },
         "security": [
           {
-            "bearerAuth": [ ]
+            "bearerAuth": []
           }
         ]
       }
@@ -2673,7 +2890,7 @@
         },
         "security": [
           {
-            "bearerAuth": [ ]
+            "bearerAuth": []
           }
         ]
       }
@@ -2724,7 +2941,7 @@
         },
         "security": [
           {
-            "bearerAuth": [ ]
+            "bearerAuth": []
           }
         ]
       }
@@ -2795,7 +3012,7 @@
         },
         "security": [
           {
-            "bearerAuth": [ ]
+            "bearerAuth": []
           }
         ]
       }
@@ -2846,7 +3063,7 @@
         },
         "security": [
           {
-            "bearerAuth": [ ]
+            "bearerAuth": []
           }
         ]
       }
@@ -2897,7 +3114,7 @@
         },
         "security": [
           {
-            "bearerAuth": [ ]
+            "bearerAuth": []
           }
         ]
       }
@@ -2957,7 +3174,7 @@
         },
         "security": [
           {
-            "bearerAuth": [ ]
+            "bearerAuth": []
           }
         ]
       }
@@ -3027,7 +3244,7 @@
         },
         "security": [
           {
-            "bearerAuth": [ ]
+            "bearerAuth": []
           }
         ]
       },
@@ -3076,7 +3293,7 @@
         },
         "security": [
           {
-            "bearerAuth": [ ]
+            "bearerAuth": []
           }
         ]
       },
@@ -3125,7 +3342,7 @@
         },
         "security": [
           {
-            "bearerAuth": [ ]
+            "bearerAuth": []
           }
         ]
       }
@@ -3209,7 +3426,7 @@
         },
         "security": [
           {
-            "bearerAuth": [ ]
+            "bearerAuth": []
           }
         ]
       }
@@ -3279,7 +3496,196 @@
         },
         "security": [
           {
-            "bearerAuth": [ ]
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/team-task/{taskId}/self-assessment": {
+      "put": {
+        "tags": [
+          "TeamSolution"
+        ],
+        "parameters": [
+          {
+            "name": "taskId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubmitSelfAssessmentDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubmitSelfAssessmentDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubmitSelfAssessmentDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/IdRequestDtoApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IdRequestDtoApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IdRequestDtoApiResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "TeamSolution"
+        ],
+        "parameters": [
+          {
+            "name": "taskId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/IdRequestDtoApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IdRequestDtoApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IdRequestDtoApiResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/team-solution/{solutionId}/preview": {
+      "post": {
+        "tags": [
+          "TeamSolution"
+        ],
+        "parameters": [
+          {
+            "name": "solutionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GradePreviewRequestDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GradePreviewRequestDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/GradePreviewRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/GradeBreakdownDtoApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GradeBreakdownDtoApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GradeBreakdownDtoApiResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
           }
         ]
       }
@@ -3330,7 +3736,7 @@
         },
         "security": [
           {
-            "bearerAuth": [ ]
+            "bearerAuth": []
           }
         ]
       }
@@ -3389,7 +3795,7 @@
         },
         "security": [
           {
-            "bearerAuth": [ ]
+            "bearerAuth": []
           }
         ]
       },
@@ -3427,7 +3833,7 @@
         },
         "security": [
           {
-            "bearerAuth": [ ]
+            "bearerAuth": []
           }
         ]
       }
@@ -3476,7 +3882,7 @@
         },
         "security": [
           {
-            "bearerAuth": [ ]
+            "bearerAuth": []
           }
         ]
       }
@@ -3933,9 +4339,156 @@
             "type": "string",
             "format": "uuid",
             "nullable": true
+          },
+          "failThreshold": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "successThreshold": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "studentScoreWeight": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "penaltyPerDay": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "maxDays": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "criteria": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CriterionDefinitionDto"
+            },
+            "nullable": true
           }
         },
         "additionalProperties": false
+      },
+      "CriterionDefinitionDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "type": {
+            "$ref": "#/components/schemas/CriterionTypeDto"
+          },
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "orderIndex": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "maxScore": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "weight": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "threshold": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "score": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "direction": {
+            "$ref": "#/components/schemas/CriterionDirection"
+          },
+          "maxAllowedScore": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "CriterionDirection": {
+        "enum": [
+          "add",
+          "subtract"
+        ],
+        "type": "string"
+      },
+      "CriterionDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "type": {
+            "$ref": "#/components/schemas/CriterionTypeDto"
+          },
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "orderIndex": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "maxScore": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "weight": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "threshold": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "score": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "direction": {
+            "$ref": "#/components/schemas/CriterionDirection"
+          },
+          "maxAllowedScore": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "CriterionTypeDto": {
+        "enum": [
+          "weighted",
+          "quality",
+          "bonusPenalty",
+          "blocking"
+        ],
+        "type": "string"
       },
       "EditCommentRequestDto": {
         "required": [
@@ -3946,6 +4499,26 @@
           "text": {
             "minLength": 1,
             "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "EvaluationDto": {
+        "type": "object",
+        "properties": {
+          "weightedValues": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WeightedValueDto"
+            },
+            "nullable": true
+          },
+          "toggledValues": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ToggledValueDto"
+            },
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -3996,6 +4569,75 @@
           "name": {
             "type": "string",
             "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "GradeBreakdownDto": {
+        "type": "object",
+        "properties": {
+          "baseTeacherScore": {
+            "type": "number",
+            "format": "float"
+          },
+          "baseStudentScore": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "baseScore": {
+            "type": "number",
+            "format": "float"
+          },
+          "afterQualityCoefficient": {
+            "type": "number",
+            "format": "float"
+          },
+          "latePenalty": {
+            "type": "number",
+            "format": "float"
+          },
+          "afterLatePenalty": {
+            "type": "number",
+            "format": "float"
+          },
+          "afterBlocking": {
+            "type": "number",
+            "format": "float"
+          },
+          "finalScore": {
+            "type": "number",
+            "format": "float"
+          },
+          "expiredDays": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "thresholdApplied": {
+            "type": "boolean"
+          },
+          "thresholdReason": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "GradeBreakdownDtoApiResponse": {
+        "required": [
+          "type"
+        ],
+        "type": "object",
+        "properties": {
+          "type": {
+            "$ref": "#/components/schemas/ApiResponseType"
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/GradeBreakdownDto"
           }
         },
         "additionalProperties": false
@@ -4103,6 +4745,15 @@
         },
         "additionalProperties": false
       },
+      "GradePreviewRequestDto": {
+        "type": "object",
+        "properties": {
+          "evaluation": {
+            "$ref": "#/components/schemas/EvaluationDto"
+          }
+        },
+        "additionalProperties": false
+      },
       "GradeVoteType": {
         "enum": [
           "for",
@@ -4192,6 +4843,23 @@
           },
           "data": {
             "$ref": "#/components/schemas/JoinCourseResponseDto"
+          }
+        },
+        "additionalProperties": false
+      },
+      "MemberSelfAssessmentDto": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "credentials": {
+            "type": "string",
+            "nullable": true
+          },
+          "evaluation": {
+            "$ref": "#/components/schemas/EvaluationDto"
           }
         },
         "additionalProperties": false
@@ -4301,6 +4969,38 @@
           },
           "allowStudentTransferCaptain": {
             "type": "boolean",
+            "nullable": true
+          },
+          "failThreshold": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "successThreshold": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "studentScoreWeight": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "penaltyPerDay": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "maxDays": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "criteria": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CriterionDto"
+            },
             "nullable": true
           }
         },
@@ -4466,6 +5166,15 @@
           "updatedDate": {
             "type": "string",
             "format": "date-time"
+          },
+          "selfAssessment": {
+            "$ref": "#/components/schemas/EvaluationDto"
+          },
+          "teacherEvaluation": {
+            "$ref": "#/components/schemas/EvaluationDto"
+          },
+          "breakdown": {
+            "$ref": "#/components/schemas/GradeBreakdownDto"
           }
         },
         "additionalProperties": false
@@ -4530,6 +5239,19 @@
           },
           "submittedBy": {
             "$ref": "#/components/schemas/UserCredentialsDto"
+          },
+          "selfAssessments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MemberSelfAssessmentDto"
+            },
+            "nullable": true
+          },
+          "teacherEvaluation": {
+            "$ref": "#/components/schemas/EvaluationDto"
+          },
+          "breakdown": {
+            "$ref": "#/components/schemas/GradeBreakdownDto"
           }
         },
         "additionalProperties": false
@@ -4553,6 +5275,15 @@
         },
         "additionalProperties": false
       },
+      "SubmitSelfAssessmentDto": {
+        "type": "object",
+        "properties": {
+          "evaluation": {
+            "$ref": "#/components/schemas/EvaluationDto"
+          }
+        },
+        "additionalProperties": false
+      },
       "SubmitSolutionRequestDto": {
         "type": "object",
         "properties": {
@@ -4567,6 +5298,9 @@
               "format": "uuid"
             },
             "nullable": true
+          },
+          "selfAssessment": {
+            "$ref": "#/components/schemas/EvaluationDto"
           }
         },
         "additionalProperties": false
@@ -4585,6 +5319,9 @@
               "format": "uuid"
             },
             "nullable": true
+          },
+          "selfAssessment": {
+            "$ref": "#/components/schemas/EvaluationDto"
           }
         },
         "additionalProperties": false
@@ -4803,6 +5540,19 @@
         },
         "additionalProperties": false
       },
+      "ToggledValueDto": {
+        "type": "object",
+        "properties": {
+          "criterionId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "enabled": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
       "UpdateSolutionRequestDto": {
         "required": [
           "status"
@@ -4820,6 +5570,9 @@
           "comment": {
             "type": "string",
             "nullable": true
+          },
+          "evaluation": {
+            "$ref": "#/components/schemas/EvaluationDto"
           }
         },
         "additionalProperties": false
@@ -4841,6 +5594,9 @@
           "comment": {
             "type": "string",
             "nullable": true
+          },
+          "evaluation": {
+            "$ref": "#/components/schemas/EvaluationDto"
           }
         },
         "additionalProperties": false
@@ -5084,6 +5840,20 @@
           "email": {
             "type": "string",
             "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "WeightedValueDto": {
+        "type": "object",
+        "properties": {
+          "criterionId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "score": {
+            "type": "number",
+            "format": "float"
           }
         },
         "additionalProperties": false

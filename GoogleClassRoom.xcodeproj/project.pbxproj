@@ -101,7 +101,12 @@
 				Views/Posts/PostDetailView.swift,
 				Views/Profile/ProfileView.swift,
 				Views/Solutions/ReviewSolutionView.swift,
+				Views/Solutions/SolutionCommentsView.swift,
 				Views/Solutions/SolutionView.swift,
+				Views/Teams/GradeDistributionView.swift,
+				Views/Teams/ReviewTeamSolutionView.swift,
+				Views/Teams/TeamSolutionView.swift,
+				Views/Teams/TeamTaskView.swift,
 			);
 			target = 9F7F94712F637CB7001CA245 /* GoogleClassRoomTests */;
 		};

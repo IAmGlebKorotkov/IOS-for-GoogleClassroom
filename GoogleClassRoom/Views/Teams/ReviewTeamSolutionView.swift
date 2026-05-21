@@ -4,8 +4,8 @@ struct ReviewTeamSolutionView: View {
 
     @StateObject private var vm: ReviewTeamSolutionViewModel
 
-    init(taskId: UUID, maxScore: Int?) {
-        _vm = StateObject(wrappedValue: ReviewTeamSolutionViewModel(taskId: taskId, maxScore: maxScore))
+    init(taskId: UUID, maxScore: Int?, criteria: [CriterionDto] = []) {
+        _vm = StateObject(wrappedValue: ReviewTeamSolutionViewModel(taskId: taskId, maxScore: maxScore, criteria: criteria))
     }
 
     var body: some View {
@@ -96,6 +96,9 @@ private struct TeamSolutionReviewDetailView: View {
     @State private var scoreText = ""
     @State private var comment = ""
     @State private var selectedStatus: SolutionStatus = .checked
+    @State private var weightedScores: [UUID: Double] = [:]
+    @State private var enabledCriteria: Set<UUID> = []
+    @State private var previewTask: Task<Void, Never>?
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
@@ -171,17 +174,33 @@ private struct TeamSolutionReviewDetailView: View {
                     }
                     .pickerStyle(.segmented).padding(.horizontal)
 
-                    if selectedStatus == .checked, let max = vm.maxScore {
-                        HStack {
-                            Text("Баллы (0–\(max)):")
-                            TextField("0", text: $scoreText)
-                                .keyboardType(.numberPad)
-                                .padding(8)
-                                .background(Color(.systemGray6))
-                                .cornerRadius(8)
-                                .frame(width: 80)
+                    if selectedStatus == .checked {
+                        if usesCriteria {
+                            CriteriaEvaluationView(
+                                criteria: vm.criteria,
+                                weightedScores: $weightedScores,
+                                enabledCriteria: $enabledCriteria
+                            )
+                            .padding(.horizontal)
+
+                            GradeBreakdownCard(
+                                breakdown: vm.previewBreakdown,
+                                estimatedScore: estimatedScore,
+                                isLoading: vm.isPreviewing
+                            )
+                            .padding(.horizontal)
+                        } else if let max = vm.maxScore {
+                            HStack {
+                                Text("Баллы (0–\(max)):")
+                                TextField("0", text: $scoreText)
+                                    .keyboardType(.numberPad)
+                                    .padding(8)
+                                    .background(Color(.systemGray6))
+                                    .cornerRadius(8)
+                                    .frame(width: 80)
+                            }
+                            .padding(.horizontal)
                         }
-                        .padding(.horizontal)
                     }
 
                     TextField("Комментарий (необязательно)", text: $comment, axis: .vertical)
@@ -194,13 +213,21 @@ private struct TeamSolutionReviewDetailView: View {
                 }
 
                 Button {
-                    let score = Int(scoreText)
+                    let evaluation = selectedStatus == .checked && usesCriteria ? currentEvaluation : nil
+                    let score: Int? = {
+                        guard selectedStatus == .checked else { return nil }
+                        if usesCriteria {
+                            return Int((vm.previewBreakdown?.finalScore ?? estimatedScore).rounded())
+                        }
+                        return Int(scoreText)
+                    }()
                     Task {
                         await vm.review(
                             solutionId: solution.id,
                             score: score,
                             status: selectedStatus,
-                            comment: comment.isEmpty ? nil : comment
+                            comment: comment.isEmpty ? nil : comment,
+                            evaluation: evaluation
                         )
                         if vm.errorMessage == nil { dismiss() }
                     }
@@ -221,6 +248,58 @@ private struct TeamSolutionReviewDetailView: View {
         .onAppear {
             if let score = solution.score { scoreText = "\(score)" }
             selectedStatus = solution.status
+            resetCriteriaState()
+            schedulePreview()
+        }
+        .onChange(of: weightedScores) {
+            schedulePreview()
+        }
+        .onChange(of: enabledCriteria) {
+            schedulePreview()
+        }
+        .onChange(of: selectedStatus) {
+            schedulePreview()
+        }
+        .onDisappear {
+            previewTask?.cancel()
+        }
+    }
+
+    private var usesCriteria: Bool {
+        !vm.criteria.isEmpty
+    }
+
+    private var currentEvaluation: EvaluationDto {
+        CriterionCalculator.makeEvaluation(
+            criteria: vm.criteria,
+            weightedScores: weightedScores,
+            toggledCriteria: enabledCriteria
+        )
+    }
+
+    private var estimatedScore: Double {
+        CriterionCalculator.estimatedScore(criteria: vm.criteria, evaluation: currentEvaluation)
+    }
+
+    private func resetCriteriaState() {
+        guard usesCriteria else { return }
+        vm.previewBreakdown = nil
+        var scores: [UUID: Double] = [:]
+        for criterion in vm.criteria where criterion.type == .weighted {
+            scores[criterion.id] = 0
+        }
+        weightedScores = scores
+        enabledCriteria = Set(vm.criteria.filter { $0.type == .quality }.map(\.id))
+    }
+
+    private func schedulePreview() {
+        guard usesCriteria, selectedStatus == .checked else { return }
+        let evaluation = currentEvaluation
+        previewTask?.cancel()
+        previewTask = Task {
+            try? await Task.sleep(nanoseconds: 350_000_000)
+            guard !Task.isCancelled else { return }
+            await vm.preview(solutionId: solution.id, evaluation: evaluation)
         }
     }
 

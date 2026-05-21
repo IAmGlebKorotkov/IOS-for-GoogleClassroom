@@ -12,10 +12,16 @@ final class CreatePostViewModel: ObservableObject {
     private let service: PostServiceProtocol
     private let fileService: FileServiceProtocol
 
-    init(courseId: UUID, service: PostServiceProtocol? = nil, fileService: FileServiceProtocol? = nil) {
+    init(
+        courseId: UUID,
+        service: PostServiceProtocol? = nil,
+        fileService: FileServiceProtocol? = nil,
+        uploadedFiles: [UploadedFileItem] = []
+    ) {
         self.courseId = courseId
         self.service = service ?? ServiceLocator.shared.postService
         self.fileService = fileService ?? ServiceLocator.shared.fileService
+        self.uploadedFiles = uploadedFiles
     }
 
     func uploadFile(data: Data, filename: String, mimeType: String) async {
@@ -50,10 +56,70 @@ final class CreatePostViewModel: ObservableObject {
         predefinedTeamsCount: Int? = nil,
         allowJoinTeam: Bool? = nil,
         allowLeaveTeam: Bool? = nil,
-        allowStudentTransferCaptain: Bool? = nil
+        allowStudentTransferCaptain: Bool? = nil,
+        failThreshold: Double? = nil,
+        successThreshold: Double? = nil,
+        studentScoreWeight: Double? = nil,
+        penaltyPerDay: Double? = nil,
+        maxDays: Int? = nil,
+        criteria: [CriterionDefinitionDto]? = nil
+    ) async -> Bool {
+        await savePost(
+            postId: nil,
+            type: type,
+            title: title,
+            text: text,
+            deadline: deadline,
+            maxScore: maxScore,
+            taskType: taskType,
+            solvableAfterDeadline: solvableAfterDeadline,
+            minTeamSize: minTeamSize,
+            maxTeamSize: maxTeamSize,
+            captainMode: captainMode,
+            votingDurationHours: votingDurationHours,
+            predefinedTeamsCount: predefinedTeamsCount,
+            allowJoinTeam: allowJoinTeam,
+            allowLeaveTeam: allowLeaveTeam,
+            allowStudentTransferCaptain: allowStudentTransferCaptain,
+            failThreshold: failThreshold,
+            successThreshold: successThreshold,
+            studentScoreWeight: studentScoreWeight,
+            penaltyPerDay: penaltyPerDay,
+            maxDays: maxDays,
+            criteria: criteria
+        )
+    }
+
+    func savePost(
+        postId: UUID?,
+        type: PostType,
+        title: String,
+        text: String,
+        deadline: Date?,
+        maxScore: Int,
+        taskType: TaskType,
+        solvableAfterDeadline: Bool,
+        minTeamSize: Int? = nil,
+        maxTeamSize: Int? = nil,
+        captainMode: CaptainSelectionMode? = nil,
+        votingDurationHours: Int? = nil,
+        predefinedTeamsCount: Int? = nil,
+        allowJoinTeam: Bool? = nil,
+        allowLeaveTeam: Bool? = nil,
+        allowStudentTransferCaptain: Bool? = nil,
+        failThreshold: Double? = nil,
+        successThreshold: Double? = nil,
+        studentScoreWeight: Double? = nil,
+        penaltyPerDay: Double? = nil,
+        maxDays: Int? = nil,
+        criteria: [CriterionDefinitionDto]? = nil
     ) async -> Bool {
         guard PostValidator.isValidTitle(title) else {
             errorMessage = "Введите заголовок"
+            return false
+        }
+        guard PostValidator.isValidText(text) else {
+            errorMessage = "Введите текст"
             return false
         }
         if type == .task || type == .teamTask {
@@ -62,7 +128,7 @@ final class CreatePostViewModel: ObservableObject {
                 return false
             }
             if let d = deadline {
-                guard PostValidator.isDeadlineValid(d) else {
+                guard postId != nil || PostValidator.isDeadlineValid(d) else {
                     errorMessage = "Дедлайн должен быть в будущем"
                     return false
                 }
@@ -77,7 +143,7 @@ final class CreatePostViewModel: ObservableObject {
             let request = CreatePostRequest(
                 type: type,
                 title: title,
-                text: text.isEmpty ? nil : text,
+                text: text.trimmingCharacters(in: .whitespacesAndNewlines),
                 deadline: isTaskOrTeamTask ? deadline : nil,
                 maxScore: isTaskOrTeamTask ? maxScore : nil,
                 taskType: isTaskOrTeamTask ? taskType : nil,
@@ -90,9 +156,19 @@ final class CreatePostViewModel: ObservableObject {
                 predefinedTeamsCount: type == .teamTask ? predefinedTeamsCount : nil,
                 allowJoinTeam: type == .teamTask ? allowJoinTeam : nil,
                 allowLeaveTeam: type == .teamTask ? allowLeaveTeam : nil,
-                allowStudentTransferCaptain: type == .teamTask ? allowStudentTransferCaptain : nil
+                allowStudentTransferCaptain: type == .teamTask ? allowStudentTransferCaptain : nil,
+                failThreshold: isTaskOrTeamTask ? failThreshold : nil,
+                successThreshold: isTaskOrTeamTask ? successThreshold : nil,
+                studentScoreWeight: isTaskOrTeamTask ? studentScoreWeight : nil,
+                penaltyPerDay: isTaskOrTeamTask ? penaltyPerDay : nil,
+                maxDays: isTaskOrTeamTask ? maxDays : nil,
+                criteria: isTaskOrTeamTask ? criteria : nil
             )
-            _ = try await service.createPost(courseId: courseId, request: request)
+            if let postId {
+                _ = try await service.updatePost(id: postId, request: request)
+            } else {
+                _ = try await service.createPost(courseId: courseId, request: request)
+            }
             return true
         } catch {
             errorMessage = error.localizedDescription

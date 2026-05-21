@@ -6,8 +6,10 @@ struct TeamTaskView: View {
     let maxScore: Int?
 
     @State private var showRename = false
+    @State private var showCreateTeam = false
     @State private var renameTeamId: UUID?
     @State private var newTeamName = ""
+    @State private var newTeamTitle = ""
 
     init(assignmentId: UUID, role: UserRoleType, taskTitle: String, maxScore: Int?) {
         _vm = StateObject(wrappedValue: TeamTaskViewModel(assignmentId: assignmentId, role: role))
@@ -21,13 +23,33 @@ struct TeamTaskView: View {
                 ProgressView("Загрузка команд…")
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else if vm.teams.isEmpty {
-                ContentUnavailableView(
-                    "Нет команд",
-                    systemImage: "person.3",
-                    description: Text("Команды ещё не созданы")
-                )
+                VStack(spacing: 16) {
+                    ContentUnavailableView(
+                        "Нет команд",
+                        systemImage: "person.3",
+                        description: Text("Команды ещё не созданы")
+                    )
+                    if vm.role == .teacher {
+                        Button {
+                            prepareNewTeam()
+                        } label: {
+                            Label("Создать команду", systemImage: "plus.circle.fill")
+                        }
+                        .buttonStyle(.borderedProminent)
+                    }
+                }
             } else {
                 List {
+                    if vm.role == .teacher {
+                        Section {
+                            Button {
+                                prepareNewTeam()
+                            } label: {
+                                Label("Создать команду", systemImage: "plus.circle.fill")
+                            }
+                        }
+                    }
+
                     if let myTeam = vm.myTeam {
                         Section("Моя команда") {
                             TeamCardView(
@@ -64,16 +86,25 @@ struct TeamTaskView: View {
         .toolbar {
             if vm.role == .teacher {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Menu {
-                        ForEach(vm.teams) { team in
-                            Button("Переименовать «\(team.name)»") {
-                                renameTeamId = team.id
-                                newTeamName = team.name
-                                showRename = true
-                            }
-                        }
+                    Button {
+                        prepareNewTeam()
                     } label: {
-                        Image(systemName: "ellipsis.circle")
+                        Image(systemName: "plus.circle")
+                    }
+                }
+                if !vm.teams.isEmpty {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Menu {
+                            ForEach(vm.teams) { team in
+                                Button("Переименовать «\(team.name)»") {
+                                    renameTeamId = team.id
+                                    newTeamName = team.name
+                                    showRename = true
+                                }
+                            }
+                        } label: {
+                            Image(systemName: "ellipsis.circle")
+                        }
                     }
                 }
             }
@@ -97,7 +128,22 @@ struct TeamTaskView: View {
             }
             Button("Отмена", role: .cancel) {}
         }
+        .alert("Создать команду", isPresented: $showCreateTeam) {
+            TextField("Название команды", text: $newTeamTitle)
+            Button("Создать") {
+                Task { await vm.createTeam(name: newTeamTitle) }
+            }
+            .disabled(newTeamTitle.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+            Button("Отмена", role: .cancel) {}
+        } message: {
+            Text("Команда появится в списке после создания")
+        }
         .task { await vm.load() }
+    }
+
+    private func prepareNewTeam() {
+        newTeamTitle = "Команда \(vm.teams.count + 1)"
+        showCreateTeam = true
     }
 
     @ViewBuilder

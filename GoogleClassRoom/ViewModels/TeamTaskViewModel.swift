@@ -118,6 +118,27 @@ final class TeamTaskViewModel: ObservableObject {
         }
     }
 
+    func createTeam(name: String) async {
+        let trimmedName = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard role == .teacher else { return }
+        guard !trimmedName.isEmpty else {
+            errorMessage = "Введите название команды"
+            return
+        }
+        isLoading = true
+        errorMessage = nil
+        defer { isLoading = false }
+        do {
+            _ = try await teamTaskService.createTeam(assignmentId: assignmentId, name: trimmedName)
+            successMessage = "Команда создана"
+            await load()
+        } catch let e as APIError {
+            errorMessage = e.localizedDescription
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+
     func renameTeam(teamId: UUID, newName: String) async {
         isLoading = true
         errorMessage = nil

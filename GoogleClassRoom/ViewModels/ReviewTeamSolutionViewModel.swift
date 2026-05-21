@@ -9,15 +9,19 @@ final class ReviewTeamSolutionViewModel: ObservableObject {
     @Published var isReviewing = false
     @Published var errorMessage: String?
     @Published var successMessage: String?
+    @Published var previewBreakdown: GradeBreakdownDto?
+    @Published var isPreviewing = false
 
     let taskId: UUID
     let maxScore: Int?
+    let criteria: [CriterionDto]
 
     private let service: TeamTaskServiceProtocol
 
-    init(taskId: UUID, maxScore: Int?, service: TeamTaskServiceProtocol? = nil) {
+    init(taskId: UUID, maxScore: Int?, criteria: [CriterionDto] = [], service: TeamTaskServiceProtocol? = nil) {
         self.taskId = taskId
         self.maxScore = maxScore
+        self.criteria = criteria.sorted { $0.orderIndex < $1.orderIndex }
         self.service = service ?? ServiceLocator.shared.teamTaskService
     }
 
@@ -35,7 +39,22 @@ final class ReviewTeamSolutionViewModel: ObservableObject {
         }
     }
 
-    func review(solutionId: UUID, score: Int?, status: SolutionStatus, comment: String?) async {
+    func preview(solutionId: UUID, evaluation: EvaluationDto) async {
+        guard !evaluation.isEmpty else {
+            previewBreakdown = nil
+            return
+        }
+        isPreviewing = true
+        defer { isPreviewing = false }
+        do {
+            let response = try await service.previewGrade(solutionId: solutionId, evaluation: evaluation)
+            previewBreakdown = response.data
+        } catch {
+            previewBreakdown = nil
+        }
+    }
+
+    func review(solutionId: UUID, score: Int?, status: SolutionStatus, comment: String?, evaluation: EvaluationDto? = nil) async {
         if let score = score, let max = maxScore {
             guard SolutionValidator.isScoreValid(score, maxScore: max) else {
                 errorMessage = "Оценка должна быть от 0 до \(max)"
@@ -47,7 +66,7 @@ final class ReviewTeamSolutionViewModel: ObservableObject {
         successMessage = nil
         defer { isReviewing = false }
         do {
-            _ = try await service.reviewSolution(solutionId: solutionId, score: score, status: status, comment: comment)
+            _ = try await service.reviewSolution(solutionId: solutionId, score: score, status: status, comment: comment, evaluation: evaluation)
             successMessage = "Проверено"
             await loadSolutions()
         } catch let e as APIError {

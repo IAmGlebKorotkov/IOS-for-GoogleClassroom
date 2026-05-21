@@ -9,6 +9,7 @@ enum SolutionStatus: String, Codable {
 struct SubmitSolutionRequest: Codable {
     let text: String?
     let files: [UUID]?
+    var selfAssessment: EvaluationDto? = nil
 }
 
 struct StudentSolutionDetailsDto: Codable {
@@ -18,6 +19,9 @@ struct StudentSolutionDetailsDto: Codable {
     let score: Int?
     let status: SolutionStatus
     let updatedDate: Date
+    var selfAssessment: EvaluationDto? = nil
+    var teacherEvaluation: EvaluationDto? = nil
+    var breakdown: GradeBreakdownDto? = nil
 }
 
 struct SolutionListItemDto: Codable {
@@ -39,10 +43,15 @@ struct ReviewSolutionRequest: Codable {
     let score: Int?
     let status: SolutionStatus
     let comment: String?
+    var evaluation: EvaluationDto? = nil
 }
 
 struct SolutionValidator {
     static func isScoreValid(_ score: Int, maxScore: Int) -> Bool {
+        return score >= 0 && score <= maxScore
+    }
+
+    static func isScoreValid(_ score: Double, maxScore: Double) -> Bool {
         return score >= 0 && score <= maxScore
     }
 

@@ -7,5 +7,8 @@ protocol SolutionServiceProtocol {
     func deleteSolution(taskId: UUID) async throws -> ApiResponse<IdDto>
     func getSolution(taskId: UUID) async throws -> ApiResponse<StudentSolutionDetailsDto>
     func getSolutions(taskId: UUID, skip: Int, take: Int, status: SolutionStatus?, studentId: UUID?) async throws -> ApiResponse<SolutionListDto>
+    func submitSelfAssessment(taskId: UUID, evaluation: EvaluationDto) async throws -> ApiResponse<IdDto>
+    func deleteSelfAssessment(taskId: UUID) async throws -> ApiResponse<IdDto>
+    func previewGrade(solutionId: UUID, evaluation: EvaluationDto) async throws -> ApiResponse<GradeBreakdownDto>
     func reviewSolution(solutionId: UUID, request: ReviewSolutionRequest) async throws -> ApiResponse<IdDto>
 }

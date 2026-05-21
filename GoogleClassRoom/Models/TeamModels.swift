@@ -26,6 +26,9 @@ struct StudentTeamSolutionDetailsDto: Codable {
     let updatedDate: Date
     let team: TeamDto
     let submittedBy: UserCredentialsDto
+    var selfAssessments: [MemberSelfAssessmentDto]? = nil
+    var teacherEvaluation: EvaluationDto? = nil
+    var breakdown: GradeBreakdownDto? = nil
 }
 
 struct TeamSolutionListItemDto: Codable, Identifiable {
@@ -60,4 +63,10 @@ struct GradeDistributionResponseDto: Codable {
 enum GradeVoteType: String, Codable {
     case `for` = "for"
     case against
+}
+
+struct MemberSelfAssessmentDto: Codable, Hashable {
+    let userId: UUID
+    let credentials: String?
+    let evaluation: EvaluationDto?
 }

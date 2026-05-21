@@ -20,7 +20,13 @@ final class PostService: PostServiceProtocol {
             predefinedTeamsCount: request.predefinedTeamsCount,
             allowJoinTeam: request.allowJoinTeam,
             allowLeaveTeam: request.allowLeaveTeam,
-            allowStudentTransferCaptain: request.allowStudentTransferCaptain
+            allowStudentTransferCaptain: request.allowStudentTransferCaptain,
+            failThreshold: request.failThreshold,
+            successThreshold: request.successThreshold,
+            studentScoreWeight: request.studentScoreWeight,
+            penaltyPerDay: request.penaltyPerDay,
+            maxDays: request.maxDays,
+            criteria: request.criteria
         )
         let response: ApiResponse<IdRequestDto> = try await client.request(
             path: "/api/course/\(courseId.uuidString)/task",
@@ -52,7 +58,13 @@ final class PostService: PostServiceProtocol {
             predefinedTeamsCount: request.predefinedTeamsCount,
             allowJoinTeam: request.allowJoinTeam,
             allowLeaveTeam: request.allowLeaveTeam,
-            allowStudentTransferCaptain: request.allowStudentTransferCaptain
+            allowStudentTransferCaptain: request.allowStudentTransferCaptain,
+            failThreshold: request.failThreshold,
+            successThreshold: request.successThreshold,
+            studentScoreWeight: request.studentScoreWeight,
+            penaltyPerDay: request.penaltyPerDay,
+            maxDays: request.maxDays,
+            criteria: request.criteria
         )
         let response: ApiResponse<IdRequestDto> = try await client.request(
             path: "/api/post/\(id.uuidString)",
@@ -105,4 +117,10 @@ private struct CreateUpdatePostDto: Encodable {
     let allowJoinTeam: Bool?
     let allowLeaveTeam: Bool?
     let allowStudentTransferCaptain: Bool?
+    let failThreshold: Double?
+    let successThreshold: Double?
+    let studentScoreWeight: Double?
+    let penaltyPerDay: Double?
+    let maxDays: Int?
+    let criteria: [CriterionDefinitionDto]?
 }

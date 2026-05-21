@@ -4,8 +4,8 @@ struct ReviewSolutionView: View {
 
     @StateObject private var vm: ReviewSolutionViewModel
 
-    init(taskId: UUID, maxScore: Int?) {
-        _vm = StateObject(wrappedValue: ReviewSolutionViewModel(taskId: taskId, maxScore: maxScore))
+    init(taskId: UUID, maxScore: Int?, criteria: [CriterionDto] = []) {
+        _vm = StateObject(wrappedValue: ReviewSolutionViewModel(taskId: taskId, maxScore: maxScore, criteria: criteria))
     }
 
     var body: some View {
@@ -97,6 +97,9 @@ private struct SolutionReviewDetailView: View {
     @State private var scoreText = ""
     @State private var comment = ""
     @State private var selectedStatus: SolutionStatus = .checked
+    @State private var weightedScores: [UUID: Double] = [:]
+    @State private var enabledCriteria: Set<UUID> = []
+    @State private var previewTask: Task<Void, Never>?
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
@@ -159,17 +162,33 @@ private struct SolutionReviewDetailView: View {
                     .pickerStyle(.segmented)
                     .padding(.horizontal)
 
-                    if selectedStatus == .checked, let max = vm.maxScore {
-                        HStack {
-                            Text("Баллы (0–\(max)):")
-                            TextField("0", text: $scoreText)
-                                .keyboardType(.numberPad)
-                                .padding(8)
-                                .background(Color(.systemGray6))
-                                .cornerRadius(8)
-                                .frame(width: 80)
+                    if selectedStatus == .checked {
+                        if usesCriteria {
+                            CriteriaEvaluationView(
+                                criteria: vm.criteria,
+                                weightedScores: $weightedScores,
+                                enabledCriteria: $enabledCriteria
+                            )
+                            .padding(.horizontal)
+
+                            GradeBreakdownCard(
+                                breakdown: vm.previewBreakdown,
+                                estimatedScore: estimatedScore,
+                                isLoading: vm.isPreviewing
+                            )
+                            .padding(.horizontal)
+                        } else if let max = vm.maxScore {
+                            HStack {
+                                Text("Баллы (0–\(max)):")
+                                TextField("0", text: $scoreText)
+                                    .keyboardType(.numberPad)
+                                    .padding(8)
+                                    .background(Color(.systemGray6))
+                                    .cornerRadius(8)
+                                    .frame(width: 80)
+                            }
+                            .padding(.horizontal)
                         }
-                        .padding(.horizontal)
                     }
 
                     TextField("Комментарий к решению (необязательно)", text: $comment, axis: .vertical)
@@ -188,13 +207,21 @@ private struct SolutionReviewDetailView: View {
                 }
 
                 Button {
-                    let score = Int(scoreText)
+                    let evaluation = selectedStatus == .checked && usesCriteria ? currentEvaluation : nil
+                    let score: Int? = {
+                        guard selectedStatus == .checked else { return nil }
+                        if usesCriteria {
+                            return Int((vm.previewBreakdown?.finalScore ?? estimatedScore).rounded())
+                        }
+                        return Int(scoreText)
+                    }()
                     Task {
                         await vm.review(
                             solutionId: solution.id,
                             score: score,
                             status: selectedStatus,
-                            comment: comment.isEmpty ? nil : comment
+                            comment: comment.isEmpty ? nil : comment,
+                            evaluation: evaluation
                         )
                         if vm.errorMessage == nil { dismiss() }
                     }
@@ -228,6 +255,58 @@ private struct SolutionReviewDetailView: View {
         .onAppear {
             if let score = solution.score { scoreText = "\(score)" }
             selectedStatus = solution.status
+            resetCriteriaState()
+            schedulePreview()
+        }
+        .onChange(of: weightedScores) {
+            schedulePreview()
+        }
+        .onChange(of: enabledCriteria) {
+            schedulePreview()
+        }
+        .onChange(of: selectedStatus) {
+            schedulePreview()
+        }
+        .onDisappear {
+            previewTask?.cancel()
+        }
+    }
+
+    private var usesCriteria: Bool {
+        !vm.criteria.isEmpty
+    }
+
+    private var currentEvaluation: EvaluationDto {
+        CriterionCalculator.makeEvaluation(
+            criteria: vm.criteria,
+            weightedScores: weightedScores,
+            toggledCriteria: enabledCriteria
+        )
+    }
+
+    private var estimatedScore: Double {
+        CriterionCalculator.estimatedScore(criteria: vm.criteria, evaluation: currentEvaluation)
+    }
+
+    private func resetCriteriaState() {
+        guard usesCriteria else { return }
+        vm.previewBreakdown = nil
+        var scores: [UUID: Double] = [:]
+        for criterion in vm.criteria where criterion.type == .weighted {
+            scores[criterion.id] = 0
+        }
+        weightedScores = scores
+        enabledCriteria = Set(vm.criteria.filter { $0.type == .quality }.map(\.id))
+    }
+
+    private func schedulePreview() {
+        guard usesCriteria, selectedStatus == .checked else { return }
+        let evaluation = currentEvaluation
+        previewTask?.cancel()
+        previewTask = Task {
+            try? await Task.sleep(nanoseconds: 350_000_000)
+            guard !Task.isCancelled else { return }
+            await vm.preview(solutionId: solution.id, evaluation: evaluation)
         }
     }
 }
@@ -263,5 +342,214 @@ private struct ReviewFileRowView: View {
             }
             .padding(.horizontal)
         }
+    }
+}
+
+struct CriteriaEvaluationView: View {
+    let criteria: [CriterionDto]
+    @Binding var weightedScores: [UUID: Double]
+    @Binding var enabledCriteria: Set<UUID>
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            if !weightedCriteria.isEmpty {
+                VStack(alignment: .leading, spacing: 10) {
+                    Label("Весовые критерии", systemImage: "slider.horizontal.3")
+                        .font(.subheadline.bold())
+                    ForEach(weightedCriteria) { criterion in
+                        weightedCriterionRow(criterion)
+                    }
+                }
+            }
+
+            if !bonusCriteria.isEmpty {
+                toggleGroup(title: "Бонусы", icon: "plus.circle.fill", color: .green, items: bonusCriteria)
+            }
+
+            if !penaltyCriteria.isEmpty {
+                toggleGroup(title: "Штрафы", icon: "minus.circle.fill", color: .red, items: penaltyCriteria)
+            }
+
+            if !advancedCriteria.isEmpty {
+                toggleGroup(title: "Расширенные", icon: "exclamationmark.shield.fill", color: .purple, items: advancedCriteria)
+            }
+        }
+    }
+
+    private var sortedCriteria: [CriterionDto] {
+        criteria.sorted { $0.orderIndex < $1.orderIndex }
+    }
+
+    private var weightedCriteria: [CriterionDto] {
+        sortedCriteria.filter { $0.type == .weighted }
+    }
+
+    private var bonusCriteria: [CriterionDto] {
+        sortedCriteria.filter { $0.type == .bonusPenalty && $0.direction == .add }
+    }
+
+    private var penaltyCriteria: [CriterionDto] {
+        sortedCriteria.filter { $0.type == .bonusPenalty && $0.direction == .subtract }
+    }
+
+    private var advancedCriteria: [CriterionDto] {
+        sortedCriteria.filter { $0.type == .quality || $0.type == .blocking }
+    }
+
+    private func weightedCriterionRow(_ criterion: CriterionDto) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(criterion.title ?? "Критерий")
+                        .font(.subheadline)
+                    Text("вес ×\(format(criterion.weight ?? 1)) · макс. \(format(criterion.maxScore ?? 0))")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                Spacer()
+                Text(format(weightedScores[criterion.id] ?? 0))
+                    .font(.headline)
+                    .monospacedDigit()
+            }
+
+            Slider(
+                value: Binding(
+                    get: { weightedScores[criterion.id] ?? 0 },
+                    set: { weightedScores[criterion.id] = min(max($0, 0), criterion.maxScore ?? 0) }
+                ),
+                in: 0...(criterion.maxScore ?? 0),
+                step: 0.5
+            )
+
+            SpacedDoubleStepper(
+                title: "Вклад: \(format((weightedScores[criterion.id] ?? 0) * (criterion.weight ?? 1)))",
+                value: Binding(
+                    get: { weightedScores[criterion.id] ?? 0 },
+                    set: { weightedScores[criterion.id] = min(max($0, 0), criterion.maxScore ?? 0) }
+                ),
+                range: 0...(criterion.maxScore ?? 0),
+                step: 0.5
+            )
+            .font(.caption)
+        }
+        .padding(10)
+        .background(Color(.systemGray6))
+        .cornerRadius(8)
+    }
+
+    private func toggleGroup(title: String, icon: String, color: Color, items: [CriterionDto]) -> some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Label(title, systemImage: icon)
+                .font(.subheadline.bold())
+                .foregroundStyle(color)
+            ForEach(items) { criterion in
+                Toggle(isOn: Binding(
+                    get: { enabledCriteria.contains(criterion.id) },
+                    set: { enabled in
+                        if enabled {
+                            enabledCriteria.insert(criterion.id)
+                        } else {
+                            enabledCriteria.remove(criterion.id)
+                        }
+                    }
+                )) {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(criterion.title ?? "Критерий")
+                            .font(.subheadline)
+                        Text(criterionDescription(criterion))
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+                .padding(10)
+                .background(Color(.systemGray6))
+                .cornerRadius(8)
+            }
+        }
+    }
+
+    private func criterionDescription(_ criterion: CriterionDto) -> String {
+        switch criterion.type {
+        case .weighted:
+            return "макс. \(format(criterion.maxScore ?? 0)) · вес \(format(criterion.weight ?? 1))"
+        case .bonusPenalty:
+            let sign = criterion.direction == .subtract ? "−" : "+"
+            return "\(sign)\(format(criterion.score ?? 0)) балл."
+        case .quality:
+            let sign = criterion.direction == .subtract ? "−" : "+"
+            let relation = criterion.direction == .subtract ? "ниже" : "выше"
+            return "\(sign)\(format(criterion.score ?? 0)) при \(relation) \(formatPercent(criterion.threshold ?? 0))%"
+        case .blocking:
+            return "итог не выше \(format(criterion.maxAllowedScore ?? 0))"
+        }
+    }
+
+    private func format(_ value: Double) -> String {
+        value.formatted(.number.precision(.fractionLength(0...2)))
+    }
+
+    private func formatPercent(_ value: Double) -> String {
+        format(value > 1 ? value : value * 100)
+    }
+}
+
+struct GradeBreakdownCard: View {
+    let breakdown: GradeBreakdownDto?
+    let estimatedScore: Double
+    let isLoading: Bool
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Label("Итоговая оценка", systemImage: "sum")
+                    .font(.headline)
+                Spacer()
+                if isLoading {
+                    ProgressView()
+                }
+            }
+
+            Text(format(breakdown?.finalScore ?? estimatedScore))
+                .font(.largeTitle.bold())
+                .monospacedDigit()
+
+            if let breakdown {
+                VStack(alignment: .leading, spacing: 4) {
+                    breakdownLine("База", breakdown.baseScore)
+                    breakdownLine("После качества", breakdown.afterQualityCoefficient)
+                    if breakdown.latePenalty > 0 {
+                        breakdownLine("Штраф за просрочку", -breakdown.latePenalty)
+                    }
+                    breakdownLine("После блокировок", breakdown.afterBlocking)
+                    if breakdown.thresholdApplied, let reason = breakdown.thresholdReason {
+                        Text(reason)
+                            .font(.caption)
+                            .foregroundStyle(.orange)
+                    }
+                }
+            } else {
+                Text("Локальный предварительный расчёт")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .padding()
+        .background(Color(.systemGray6))
+        .cornerRadius(10)
+    }
+
+    private func breakdownLine(_ title: String, _ value: Double) -> some View {
+        HStack {
+            Text(title)
+            Spacer()
+            Text(format(value))
+                .monospacedDigit()
+        }
+        .font(.caption)
+        .foregroundStyle(.secondary)
+    }
+
+    private func format(_ value: Double) -> String {
+        value.formatted(.number.precision(.fractionLength(0...2)))
     }
 }

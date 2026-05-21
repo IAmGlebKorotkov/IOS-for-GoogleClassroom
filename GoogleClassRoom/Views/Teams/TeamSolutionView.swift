@@ -5,11 +5,23 @@ struct TeamSolutionView: View {
 
     @StateObject private var vm: TeamSolutionViewModel
     @Environment(\.dismiss) private var dismiss
+    private let criteria: [CriterionDto]
+    private let selfAssessmentEnabled: Bool
 
     @State private var solutionText = ""
     @State private var showFilePicker = false
+    @State private var selfWeightedScores: [UUID: Double] = [:]
+    @State private var selfEnabledCriteria: Set<UUID> = []
+    @State private var selfPreviewTask: Task<Void, Never>?
 
-    init(taskId: UUID, maxScore: Int?) {
+    init(
+        taskId: UUID,
+        maxScore: Int?,
+        criteria: [CriterionDto] = [],
+        selfAssessmentEnabled: Bool = false
+    ) {
+        self.criteria = criteria.sorted { $0.orderIndex < $1.orderIndex }
+        self.selfAssessmentEnabled = selfAssessmentEnabled
         _vm = StateObject(wrappedValue: TeamSolutionViewModel(taskId: taskId, maxScore: maxScore))
     }
 
@@ -23,6 +35,7 @@ struct TeamSolutionView: View {
                             .frame(maxWidth: .infinity, minHeight: 200)
                     } else if let solution = vm.solution {
                         existingSolutionSection(solution: solution)
+                        selfAssessmentSection(solution: solution)
                         distributionButton(solution: solution)
                     } else {
                         submitSection
@@ -73,6 +86,9 @@ struct TeamSolutionView: View {
                 }
             }
             .task { await vm.load() }
+            .onDisappear {
+                selfPreviewTask?.cancel()
+            }
         }
     }
 
@@ -188,6 +204,15 @@ struct TeamSolutionView: View {
                 }
             }
 
+            if let breakdown = solution.breakdown {
+                GradeBreakdownCard(
+                    breakdown: breakdown,
+                    estimatedScore: Double(solution.score ?? 0),
+                    isLoading: false
+                )
+                .padding(.horizontal)
+            }
+
             if vm.canSubmit {
                 VStack(alignment: .leading, spacing: 12) {
                     Divider().padding(.horizontal)
@@ -236,6 +261,83 @@ struct TeamSolutionView: View {
         }
     }
 
+    @ViewBuilder
+    private func selfAssessmentSection(solution: StudentTeamSolutionDetailsDto) -> some View {
+        if !criteria.isEmpty, selfAssessmentEnabled {
+            VStack(alignment: .leading, spacing: 12) {
+                Divider().padding(.horizontal)
+
+                Text("Самооценка по критериям")
+                    .font(.headline)
+                    .padding(.horizontal)
+
+                if let selfAssessments = solution.selfAssessments, !selfAssessments.isEmpty {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Сохранённые самооценки")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                        ForEach(selfAssessments, id: \.userId) { item in
+                            HStack {
+                                Text(item.credentials ?? "Участник")
+                                Spacer()
+                                Text(formatScore(CriterionCalculator.estimatedScore(criteria: criteria, evaluation: item.evaluation ?? EvaluationDto(weightedValues: nil, toggledValues: nil))))
+                                    .monospacedDigit()
+                                    .foregroundStyle(.secondary)
+                            }
+                            .font(.caption)
+                        }
+                    }
+                    .padding(.horizontal)
+                }
+
+                CriteriaEvaluationView(
+                    criteria: criteria,
+                    weightedScores: $selfWeightedScores,
+                    enabledCriteria: $selfEnabledCriteria
+                )
+                .padding(.horizontal)
+
+                GradeBreakdownCard(
+                    breakdown: vm.selfAssessmentPreview,
+                    estimatedScore: selfAssessmentEstimatedScore,
+                    isLoading: vm.isPreviewingSelfAssessment
+                )
+                .padding(.horizontal)
+
+                ViewThatFits(in: .horizontal) {
+                    HStack(spacing: 12) {
+                        saveSelfAssessmentButton
+                        deleteSelfAssessmentButton
+                    }
+
+                    VStack(spacing: 10) {
+                        saveSelfAssessmentButton
+                        deleteSelfAssessmentButton
+                    }
+                }
+                .padding(.horizontal)
+            }
+            .onAppear {
+                resetSelfAssessmentState()
+                scheduleSelfAssessmentPreview(solution: solution)
+            }
+            .onChange(of: selfWeightedScores) {
+                scheduleSelfAssessmentPreview(solution: solution)
+            }
+            .onChange(of: selfEnabledCriteria) {
+                scheduleSelfAssessmentPreview(solution: solution)
+            }
+        } else if !criteria.isEmpty {
+            VStack(alignment: .leading, spacing: 8) {
+                Divider().padding(.horizontal)
+                Label("Самооценка отключена для этого задания", systemImage: "person.crop.circle.badge.xmark")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .padding(.horizontal)
+            }
+        }
+    }
+
     private var filesSection: some View {
         VStack(alignment: .leading, spacing: 8) {
             if !vm.uploadedFiles.isEmpty {
@@ -267,6 +369,37 @@ struct TeamSolutionView: View {
             .disabled(vm.isUploading)
             .padding(.horizontal)
         }
+    }
+
+    private var saveSelfAssessmentButton: some View {
+        Button {
+            Task { await vm.submitSelfAssessment(evaluation: selfAssessmentEvaluation) }
+        } label: {
+            Label("Сохранить самооценку", systemImage: "checkmark.circle.fill")
+                .lineLimit(1)
+                .minimumScaleFactor(0.85)
+                .frame(maxWidth: .infinity)
+                .padding()
+                .background(.green)
+                .foregroundStyle(.white)
+                .cornerRadius(12)
+        }
+        .disabled(vm.isSubmittingSelfAssessment)
+    }
+
+    private var deleteSelfAssessmentButton: some View {
+        Button(role: .destructive) {
+            Task { await vm.deleteSelfAssessment() }
+        } label: {
+            Label("Удалить", systemImage: "trash")
+                .lineLimit(1)
+                .frame(maxWidth: .infinity)
+                .padding()
+                .background(Color.red.opacity(0.1))
+                .foregroundStyle(.red)
+                .cornerRadius(12)
+        }
+        .disabled(vm.isSubmittingSelfAssessment)
     }
 
     private func solutionStatusBadge(solution: StudentTeamSolutionDetailsDto) -> some View {
@@ -335,5 +468,42 @@ struct TeamSolutionView: View {
             return type.preferredMIMEType ?? "application/octet-stream"
         }
         return "application/octet-stream"
+    }
+
+    private var selfAssessmentEvaluation: EvaluationDto {
+        CriterionCalculator.makeEvaluation(
+            criteria: criteria,
+            weightedScores: selfWeightedScores,
+            toggledCriteria: selfEnabledCriteria
+        )
+    }
+
+    private var selfAssessmentEstimatedScore: Double {
+        CriterionCalculator.estimatedScore(criteria: criteria, evaluation: selfAssessmentEvaluation)
+    }
+
+    private func resetSelfAssessmentState() {
+        guard !criteria.isEmpty, selfWeightedScores.isEmpty else { return }
+        var scores: [UUID: Double] = [:]
+        for criterion in criteria where criterion.type == .weighted {
+            scores[criterion.id] = 0
+        }
+        selfWeightedScores = scores
+        selfEnabledCriteria = Set(criteria.filter { $0.type == .quality }.map(\.id))
+    }
+
+    private func scheduleSelfAssessmentPreview(solution: StudentTeamSolutionDetailsDto) {
+        guard let solutionId = solution.id, !criteria.isEmpty else { return }
+        let evaluation = selfAssessmentEvaluation
+        selfPreviewTask?.cancel()
+        selfPreviewTask = Task {
+            try? await Task.sleep(nanoseconds: 350_000_000)
+            guard !Task.isCancelled else { return }
+            await vm.previewSelfAssessment(solutionId: solutionId, evaluation: evaluation)
+        }
+    }
+
+    private func formatScore(_ value: Double) -> String {
+        value.formatted(.number.precision(.fractionLength(0...2)))
     }
 }

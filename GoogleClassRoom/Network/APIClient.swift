@@ -5,7 +5,7 @@ final class APIClient {
     static let shared = APIClient()
     private init() {}
     
-    static let baseURL = "http://37.21.130.4:5000"
+    static let baseURL = "http://176.209.147.7:5000"
 
     private let session: URLSession = {
         let config = URLSessionConfiguration.default

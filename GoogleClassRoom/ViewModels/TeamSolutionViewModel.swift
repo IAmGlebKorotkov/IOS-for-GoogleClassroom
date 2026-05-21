@@ -11,6 +11,9 @@ final class TeamSolutionViewModel: ObservableObject {
     @Published var successMessage: String?
     @Published var uploadedFiles: [UploadedFileItem] = []
     @Published var isCaptain = false
+    @Published var selfAssessmentPreview: GradeBreakdownDto?
+    @Published var isPreviewingSelfAssessment = false
+    @Published var isSubmittingSelfAssessment = false
 
     let taskId: UUID
     let maxScore: Int?
@@ -98,6 +101,53 @@ final class TeamSolutionViewModel: ObservableObject {
         do {
             _ = try await service.deleteSolution(taskId: taskId)
             solution = nil
+        } catch let e as APIError {
+            errorMessage = e.localizedDescription
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+
+    func previewSelfAssessment(solutionId: UUID, evaluation: EvaluationDto) async {
+        guard !evaluation.isEmpty else {
+            selfAssessmentPreview = nil
+            return
+        }
+        isPreviewingSelfAssessment = true
+        defer { isPreviewingSelfAssessment = false }
+        do {
+            let response = try await service.previewGrade(solutionId: solutionId, evaluation: evaluation)
+            selfAssessmentPreview = response.data
+        } catch {
+            selfAssessmentPreview = nil
+        }
+    }
+
+    func submitSelfAssessment(evaluation: EvaluationDto) async {
+        isSubmittingSelfAssessment = true
+        errorMessage = nil
+        successMessage = nil
+        defer { isSubmittingSelfAssessment = false }
+        do {
+            _ = try await service.submitSelfAssessment(taskId: taskId, evaluation: evaluation)
+            successMessage = "Самооценка сохранена"
+            await load()
+        } catch let e as APIError {
+            errorMessage = e.localizedDescription
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+
+    func deleteSelfAssessment() async {
+        isSubmittingSelfAssessment = true
+        errorMessage = nil
+        successMessage = nil
+        defer { isSubmittingSelfAssessment = false }
+        do {
+            _ = try await service.deleteSelfAssessment(taskId: taskId)
+            successMessage = "Самооценка удалена"
+            await load()
         } catch let e as APIError {
             errorMessage = e.localizedDescription
         } catch {

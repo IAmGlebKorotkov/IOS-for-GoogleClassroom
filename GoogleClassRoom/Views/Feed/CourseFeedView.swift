@@ -68,7 +68,9 @@ struct CourseFeedView: View {
         .navigationDestination(for: NavDestination.self) { dest in
             switch dest {
             case .post(let item):
-                PostDetailView(postId: item.id, courseId: vm.courseId, title: item.title, role: role)
+                PostDetailView(postId: item.id, courseId: vm.courseId, title: item.title, role: role) {
+                    Task { await vm.loadFeed(reset: true) }
+                }
             case .members:
                 CourseMembersView(courseId: vm.courseId)
             case .analytics:
