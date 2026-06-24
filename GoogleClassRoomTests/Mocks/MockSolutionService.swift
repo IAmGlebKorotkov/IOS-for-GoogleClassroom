@@ -102,4 +102,20 @@ final class MockSolutionService: SolutionServiceProtocol {
         if let error = reviewError { throw error }
         return ApiResponse(type: .success, message: nil, data: IdDto(id: solutionId))
     }
+
+    func getNextPeerReview(taskId: UUID) async throws -> ApiResponse<PeerReviewTargetDto> {
+        return ApiResponse(type: .success, message: nil, data: nil)
+    }
+
+    func submitPeerReview(reviewId: UUID, evaluation: EvaluationDto) async throws -> ApiResponse<PeerReviewProgressDto> {
+        return ApiResponse(type: .success, message: nil, data: PeerReviewProgressDto(gradingMode: .peerToPeer, required: 1, completed: 1, canFinish: true, isCounted: true))
+    }
+
+    func getPeerReviewProgress(taskId: UUID) async throws -> ApiResponse<PeerReviewProgressDto> {
+        return ApiResponse(type: .success, message: nil, data: PeerReviewProgressDto(gradingMode: .peerToPeer, required: 1, completed: 0, canFinish: false, isCounted: false))
+    }
+
+    func finishPeerReview(taskId: UUID) async throws -> ApiResponse<PeerReviewProgressDto> {
+        return ApiResponse(type: .success, message: nil, data: PeerReviewProgressDto(gradingMode: .peerToPeer, required: 1, completed: 1, canFinish: true, isCounted: true))
+    }
 }

@@ -43,6 +43,8 @@ struct CreatePostView: View {
     @State private var useLatePenalty = false
     @State private var penaltyPerDay = 1.0
     @State private var maxDays = 5
+    @State private var gradingMode: GradingMode = .teacherReview
+    @State private var minPeerReviewsRequired = 1
 
     init(courseId: UUID) {
         editingPostId = nil
@@ -89,6 +91,8 @@ struct CreatePostView: View {
         _useLatePenalty = State(initialValue: post.penaltyPerDay != nil)
         _penaltyPerDay = State(initialValue: post.penaltyPerDay ?? 1)
         _maxDays = State(initialValue: max(post.maxDays ?? 5, 1))
+        _gradingMode = State(initialValue: post.gradingMode ?? .teacherReview)
+        _minPeerReviewsRequired = State(initialValue: max(post.minPeerReviewsRequired ?? 1, 1))
     }
 
     private static func uploadedFiles(from files: [FileDto]?) -> [UploadedFileItem] {
@@ -204,6 +208,7 @@ struct CreatePostView: View {
                     }
 
                     gradingCriteriaSection
+                    gradingModeSection
                     advancedGradingSection
                 }
 
@@ -309,6 +314,8 @@ struct CreatePostView: View {
                                 studentScoreWeight: useStudentScoreWeight ? studentScoreWeight : nil,
                                 penaltyPerDay: useLatePenalty ? penaltyPerDay : nil,
                                 maxDays: useLatePenalty ? maxDays : nil,
+                                gradingMode: gradingMode,
+                                minPeerReviewsRequired: type == .task && gradingMode == .peerToPeer ? minPeerReviewsRequired : nil,
                                 criteria: criteriaPayload.isEmpty ? nil : criteriaPayload
                             )
                             if success {
@@ -517,6 +524,32 @@ struct CreatePostView: View {
                 } label: {
                     Label("Добавить блокировку", systemImage: "plus.circle")
                         .frame(maxWidth: .infinity, alignment: .leading)
+                }
+            }
+        }
+    }
+
+    private var gradingModeSection: some View {
+        Section("Механизм оценивания") {
+            Picker("Проверка", selection: $gradingMode) {
+                Label("Преподаватель", systemImage: "person.text.rectangle")
+                    .tag(GradingMode.teacherReview)
+                Label("P2P", systemImage: "person.2.wave.2")
+                    .tag(GradingMode.peerToPeer)
+            }
+            .pickerStyle(.segmented)
+
+            if gradingMode == .peerToPeer {
+                if type == .task {
+                    SpacedIntStepper(
+                        title: "Минимум оцениваний: \(minPeerReviewsRequired)",
+                        value: $minPeerReviewsRequired,
+                        range: 1...20
+                    )
+                } else {
+                    Label("Студенту нужно оценить одну другую команду", systemImage: "checkmark.circle")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
                 }
             }
         }

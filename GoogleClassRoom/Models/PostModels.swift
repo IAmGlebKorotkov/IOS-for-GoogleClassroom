@@ -4,6 +4,34 @@ enum PostType: String, Codable, Hashable {
     case post
     case task
     case teamTask = "teaM_TASK"
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        let rawValue = try container.decode(String.self)
+        let normalized = rawValue
+            .replacingOccurrences(of: "_", with: "")
+            .replacingOccurrences(of: "-", with: "")
+            .lowercased()
+
+        switch normalized {
+        case "post":
+            self = .post
+        case "task":
+            self = .task
+        case "teamtask":
+            self = .teamTask
+        default:
+            throw DecodingError.dataCorruptedError(
+                in: container,
+                debugDescription: "Unsupported post type: \(rawValue)"
+            )
+        }
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(rawValue)
+    }
 }
 
 enum CaptainSelectionMode: String, Codable {
@@ -15,6 +43,37 @@ enum CaptainSelectionMode: String, Codable {
 enum TaskType: String, Codable {
     case mandatory
     case optional
+}
+
+enum GradingMode: String, Codable, Hashable {
+    case teacherReview
+    case peerToPeer
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        let rawValue = try container.decode(String.self)
+        let normalized = rawValue
+            .replacingOccurrences(of: "_", with: "")
+            .replacingOccurrences(of: "-", with: "")
+            .lowercased()
+
+        switch normalized {
+        case "teacherreview":
+            self = .teacherReview
+        case "peertopeer", "p2p":
+            self = .peerToPeer
+        default:
+            throw DecodingError.dataCorruptedError(
+                in: container,
+                debugDescription: "Unsupported grading mode: \(rawValue)"
+            )
+        }
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(rawValue)
+    }
 }
 
 enum CriterionTypeDto: String, Codable, Hashable {
@@ -29,7 +88,7 @@ enum CriterionDirection: String, Codable, Hashable {
     case subtract
 }
 
-struct FileDto: Codable, Equatable {
+struct FileDto: Codable, Equatable, Hashable {
     let id: String?
     let name: String?
 }
@@ -208,6 +267,8 @@ struct CreatePostRequest: Codable {
     var studentScoreWeight: Double? = nil
     var penaltyPerDay: Double? = nil
     var maxDays: Int? = nil
+    var gradingMode: GradingMode? = nil
+    var minPeerReviewsRequired: Int? = nil
     var criteria: [CriterionDefinitionDto]? = nil
 }
 
@@ -235,6 +296,8 @@ struct PostDetailsDto: Codable {
     var studentScoreWeight: Double? = nil
     var penaltyPerDay: Double? = nil
     var maxDays: Int? = nil
+    var gradingMode: GradingMode? = nil
+    var minPeerReviewsRequired: Int? = nil
     var criteria: [CriterionDto]? = nil
 }
 

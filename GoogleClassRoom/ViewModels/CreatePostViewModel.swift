@@ -62,6 +62,8 @@ final class CreatePostViewModel: ObservableObject {
         studentScoreWeight: Double? = nil,
         penaltyPerDay: Double? = nil,
         maxDays: Int? = nil,
+        gradingMode: GradingMode? = nil,
+        minPeerReviewsRequired: Int? = nil,
         criteria: [CriterionDefinitionDto]? = nil
     ) async -> Bool {
         await savePost(
@@ -86,6 +88,8 @@ final class CreatePostViewModel: ObservableObject {
             studentScoreWeight: studentScoreWeight,
             penaltyPerDay: penaltyPerDay,
             maxDays: maxDays,
+            gradingMode: gradingMode,
+            minPeerReviewsRequired: minPeerReviewsRequired,
             criteria: criteria
         )
     }
@@ -112,6 +116,8 @@ final class CreatePostViewModel: ObservableObject {
         studentScoreWeight: Double? = nil,
         penaltyPerDay: Double? = nil,
         maxDays: Int? = nil,
+        gradingMode: GradingMode? = nil,
+        minPeerReviewsRequired: Int? = nil,
         criteria: [CriterionDefinitionDto]? = nil
     ) async -> Bool {
         guard PostValidator.isValidTitle(title) else {
@@ -133,6 +139,10 @@ final class CreatePostViewModel: ObservableObject {
                     return false
                 }
             }
+        }
+        if type == .task, gradingMode == .peerToPeer, (minPeerReviewsRequired ?? 0) < 1 {
+            errorMessage = "Укажите минимум P2P-оцениваний"
+            return false
         }
         isLoading = true
         errorMessage = nil
@@ -162,6 +172,8 @@ final class CreatePostViewModel: ObservableObject {
                 studentScoreWeight: isTaskOrTeamTask ? studentScoreWeight : nil,
                 penaltyPerDay: isTaskOrTeamTask ? penaltyPerDay : nil,
                 maxDays: isTaskOrTeamTask ? maxDays : nil,
+                gradingMode: isTaskOrTeamTask ? gradingMode : nil,
+                minPeerReviewsRequired: type == .task && gradingMode == .peerToPeer ? minPeerReviewsRequired : nil,
                 criteria: isTaskOrTeamTask ? criteria : nil
             )
             if let postId {

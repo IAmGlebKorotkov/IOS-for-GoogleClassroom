@@ -22,6 +22,7 @@ struct StudentSolutionDetailsDto: Codable {
     var selfAssessment: EvaluationDto? = nil
     var teacherEvaluation: EvaluationDto? = nil
     var breakdown: GradeBreakdownDto? = nil
+    var peerReviewProgress: PeerReviewProgressDto? = nil
 }
 
 struct SolutionListItemDto: Codable {
@@ -44,6 +45,31 @@ struct ReviewSolutionRequest: Codable {
     let status: SolutionStatus
     let comment: String?
     var evaluation: EvaluationDto? = nil
+}
+
+struct AnonymizedSolutionDto: Codable, Hashable {
+    let text: String?
+    let files: [FileDto]?
+}
+
+struct PeerReviewTargetDto: Codable, Hashable {
+    let reviewId: UUID
+    let taskId: UUID
+    let solution: AnonymizedSolutionDto?
+    let criteria: [CriterionDto]?
+    let assignedAt: Date
+}
+
+struct PeerReviewProgressDto: Codable, Hashable {
+    let gradingMode: GradingMode?
+    let required: Int
+    let completed: Int
+    let canFinish: Bool
+    let isCounted: Bool
+}
+
+struct SubmitPeerReviewDto: Codable {
+    let evaluation: EvaluationDto
 }
 
 struct SolutionValidator {

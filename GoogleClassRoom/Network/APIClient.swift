@@ -5,7 +5,7 @@ final class APIClient {
     static let shared = APIClient()
     private init() {}
     
-    static let baseURL = "http://176.209.147.7:5000"
+    static let baseURL = "http://92.126.62.35:5000"
 
     private let session: URLSession = {
         let config = URLSessionConfiguration.default
@@ -15,7 +15,17 @@ final class APIClient {
 
     private let decoder: JSONDecoder = {
         let d = JSONDecoder()
-        d.dateDecodingStrategy = .iso8601
+        d.dateDecodingStrategy = .custom { decoder in
+            let container = try decoder.singleValueContainer()
+            let value = try container.decode(String.self)
+            if let date = DateParser.parse(value) {
+                return date
+            }
+            throw DecodingError.dataCorruptedError(
+                in: container,
+                debugDescription: "Unsupported date format: \(value)"
+            )
+        }
         return d
     }()
 
@@ -145,6 +155,48 @@ final class APIClient {
             throw APIError.decodingError(error)
             print(APIError.decodingError(error))
         }
+    }
+}
+
+private enum DateParser {
+    private static let iso8601WithFractionalSeconds: ISO8601DateFormatter = {
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        return formatter
+    }()
+
+    private static let iso8601: ISO8601DateFormatter = {
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withInternetDateTime]
+        return formatter
+    }()
+
+    private static let formatters: [DateFormatter] = {
+        let formats = [
+            "yyyy-MM-dd'T'HH:mm:ss.SSSSSSSXXXXX",
+            "yyyy-MM-dd'T'HH:mm:ss.SSSSSSXXXXX",
+            "yyyy-MM-dd'T'HH:mm:ss.SSSXXXXX",
+            "yyyy-MM-dd'T'HH:mm:ssXXXXX",
+            "yyyy-MM-dd'T'HH:mm:ss.SSSSSSS",
+            "yyyy-MM-dd'T'HH:mm:ss.SSSSSS",
+            "yyyy-MM-dd'T'HH:mm:ss.SSS",
+            "yyyy-MM-dd'T'HH:mm:ss"
+        ]
+
+        return formats.map { format in
+            let formatter = DateFormatter()
+            formatter.locale = Locale(identifier: "en_US_POSIX")
+            formatter.calendar = Calendar(identifier: .gregorian)
+            formatter.timeZone = TimeZone(secondsFromGMT: 0)
+            formatter.dateFormat = format
+            return formatter
+        }
+    }()
+
+    static func parse(_ value: String) -> Date? {
+        iso8601WithFractionalSeconds.date(from: value)
+            ?? iso8601.date(from: value)
+            ?? formatters.lazy.compactMap { $0.date(from: value) }.first
     }
 }
 

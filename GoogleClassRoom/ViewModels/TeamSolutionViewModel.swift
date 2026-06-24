@@ -165,3 +165,69 @@ final class TeamSolutionViewModel: ObservableObject {
         return status == .pending
     }
 }
+
+@MainActor
+final class TeamPeerReviewViewModel: ObservableObject {
+    @Published var targets: [PeerReviewTeamTargetDto] = []
+    @Published var selectedTarget: PeerReviewTeamTargetDto?
+    @Published var progress: PeerReviewProgressDto?
+    @Published var isLoading = false
+    @Published var isSubmitting = false
+    @Published var errorMessage: String?
+    @Published var successMessage: String?
+
+    let taskId: UUID
+    let criteria: [CriterionDto]
+    private let service: TeamTaskServiceProtocol
+
+    init(taskId: UUID, criteria: [CriterionDto], service: TeamTaskServiceProtocol? = nil) {
+        self.taskId = taskId
+        self.criteria = criteria.sorted { $0.orderIndex < $1.orderIndex }
+        self.service = service ?? ServiceLocator.shared.teamTaskService
+    }
+
+    func load() async {
+        isLoading = true
+        errorMessage = nil
+        successMessage = nil
+        defer { isLoading = false }
+
+        do {
+            async let progressResponse = service.getTeamPeerReviewProgress(taskId: taskId)
+            async let targetsResponse = service.getAvailablePeerReviews(taskId: taskId)
+            let (progress, targets) = try await (progressResponse, targetsResponse)
+            self.progress = progress.data
+            self.targets = targets.data?.records ?? []
+            if selectedTarget == nil {
+                selectedTarget = self.targets.first
+            }
+        } catch let e as APIError {
+            errorMessage = e.localizedDescription
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+
+    func submit(evaluation: EvaluationDto) async {
+        guard let target = selectedTarget else { return }
+        isSubmitting = true
+        errorMessage = nil
+        successMessage = nil
+        defer { isSubmitting = false }
+
+        do {
+            let response = try await service.submitTeamPeerReview(
+                teamSolutionId: target.teamSolutionId,
+                evaluation: evaluation
+            )
+            progress = response.data
+            successMessage = "Оценка команды сохранена"
+            selectedTarget = nil
+            await load()
+        } catch let e as APIError {
+            errorMessage = e.localizedDescription
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+}

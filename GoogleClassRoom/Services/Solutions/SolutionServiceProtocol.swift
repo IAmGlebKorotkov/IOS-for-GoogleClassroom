@@ -11,4 +11,8 @@ protocol SolutionServiceProtocol {
     func deleteSelfAssessment(taskId: UUID) async throws -> ApiResponse<IdDto>
     func previewGrade(solutionId: UUID, evaluation: EvaluationDto) async throws -> ApiResponse<GradeBreakdownDto>
     func reviewSolution(solutionId: UUID, request: ReviewSolutionRequest) async throws -> ApiResponse<IdDto>
+    func getNextPeerReview(taskId: UUID) async throws -> ApiResponse<PeerReviewTargetDto>
+    func submitPeerReview(reviewId: UUID, evaluation: EvaluationDto) async throws -> ApiResponse<PeerReviewProgressDto>
+    func getPeerReviewProgress(taskId: UUID) async throws -> ApiResponse<PeerReviewProgressDto>
+    func finishPeerReview(taskId: UUID) async throws -> ApiResponse<PeerReviewProgressDto>
 }

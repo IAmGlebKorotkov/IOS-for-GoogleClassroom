@@ -43,17 +43,7 @@ struct PostDetailView: View {
                             }
                             .padding(.horizontal)
                         } else {
-                            NavigationLink {
-                                ReviewSolutionView(taskId: vm.postId, maxScore: post.maxScore, criteria: post.criteria ?? [])
-                            } label: {
-                                Label("Решения студентов", systemImage: "person.text.rectangle")
-                                    .frame(maxWidth: .infinity)
-                                    .padding()
-                                    .background(.orange)
-                                    .foregroundStyle(.white)
-                                    .cornerRadius(12)
-                            }
-                            .padding(.horizontal)
+                            teacherTaskReviewAction(post: post)
                         }
                     }
 
@@ -90,17 +80,7 @@ struct PostDetailView: View {
                                 }
                                 .padding(.horizontal)
                             } else {
-                                NavigationLink {
-                                    ReviewTeamSolutionView(taskId: vm.postId, maxScore: post.maxScore, criteria: post.criteria ?? [])
-                                } label: {
-                                    Label("Решения команд", systemImage: "person.text.rectangle")
-                                        .frame(maxWidth: .infinity)
-                                        .padding()
-                                        .background(.orange)
-                                        .foregroundStyle(.white)
-                                        .cornerRadius(12)
-                                }
-                                .padding(.horizontal)
+                                teacherTeamReviewAction(post: post)
                             }
                         }
                     }
@@ -202,6 +182,70 @@ struct PostDetailView: View {
         guard role == .teacher, let post = vm.post else { return false }
         return post.type == .task || post.type == .teamTask
     }
+
+    @ViewBuilder
+    private func teacherTaskReviewAction(post: PostDetailsDto) -> some View {
+        if (post.gradingMode ?? .teacherReview) == .teacherReview {
+            NavigationLink {
+                ReviewSolutionView(taskId: vm.postId, maxScore: post.maxScore, criteria: post.criteria ?? [])
+            } label: {
+                Label("Решения студентов", systemImage: "person.text.rectangle")
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(.orange)
+                    .foregroundStyle(.white)
+                    .cornerRadius(12)
+            }
+            .padding(.horizontal)
+        } else {
+            peerReviewLockedNotice(
+                title: "Проверка преподавателем отключена",
+                subtitle: "Это P2P-задание: работа засчитывается после сдачи решения и минимального числа оценок от студента."
+            )
+        }
+    }
+
+    @ViewBuilder
+    private func teacherTeamReviewAction(post: PostDetailsDto) -> some View {
+        if (post.gradingMode ?? .teacherReview) == .teacherReview {
+            NavigationLink {
+                ReviewTeamSolutionView(taskId: vm.postId, maxScore: post.maxScore, criteria: post.criteria ?? [])
+            } label: {
+                Label("Решения команд", systemImage: "person.text.rectangle")
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(.orange)
+                    .foregroundStyle(.white)
+                    .cornerRadius(12)
+            }
+            .padding(.horizontal)
+        } else {
+            peerReviewLockedNotice(
+                title: "Проверка команд преподавателем отключена",
+                subtitle: "Это P2P-задание: студенту нужно оценить работу хотя бы одной другой команды."
+            )
+        }
+    }
+
+    private func peerReviewLockedNotice(title: String, subtitle: String) -> some View {
+        HStack(alignment: .top, spacing: 10) {
+            Image(systemName: "person.2.wave.2.fill")
+                .foregroundStyle(.indigo)
+                .frame(width: 24)
+            VStack(alignment: .leading, spacing: 4) {
+                Text(title)
+                    .font(.subheadline.bold())
+                Text(subtitle)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+            Spacer()
+        }
+        .padding()
+        .background(Color.indigo.opacity(0.1))
+        .cornerRadius(12)
+        .padding(.horizontal)
+    }
 }
 
 private struct PostBodyView: View {
@@ -233,6 +277,9 @@ private struct PostBodyView: View {
                     Text("Максимум: \(maxScore) баллов")
                         .font(.subheadline)
                 }
+            }
+            if post.type == .task || post.type == .teamTask {
+                gradingModeBadge
             }
             if let criteria = post.criteria, !criteria.isEmpty {
                 VStack(alignment: .leading, spacing: 4) {
@@ -283,6 +330,26 @@ private struct PostBodyView: View {
         post.successThreshold != nil ||
         post.studentScoreWeight != nil ||
         post.penaltyPerDay != nil
+    }
+
+    private var gradingModeBadge: some View {
+        let mode = post.gradingMode ?? .teacherReview
+        return HStack(spacing: 8) {
+            Image(systemName: mode == .peerToPeer ? "person.2.wave.2.fill" : "person.text.rectangle")
+                .foregroundStyle(mode == .peerToPeer ? .indigo : .orange)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(mode == .peerToPeer ? "P2P-оценивание" : "Проверяет преподаватель")
+                    .font(.subheadline.bold())
+                if mode == .peerToPeer {
+                    Text(post.type == .task ? "Минимум оцениваний: \(post.minPeerReviewsRequired ?? 1)" : "Нужно оценить одну другую команду")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            }
+        }
+        .padding(10)
+        .background((mode == .peerToPeer ? Color.indigo : Color.orange).opacity(0.1))
+        .cornerRadius(10)
     }
 
     private var typeIcon: String {

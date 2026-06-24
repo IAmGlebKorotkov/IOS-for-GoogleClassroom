@@ -111,4 +111,32 @@ final class SolutionService: SolutionServiceProtocol {
             body: body
         )
     }
+
+    func getNextPeerReview(taskId: UUID) async throws -> ApiResponse<PeerReviewTargetDto> {
+        return try await client.request(
+            path: "/api/task/\(taskId.uuidString)/peer-review/next"
+        )
+    }
+
+    func submitPeerReview(reviewId: UUID, evaluation: EvaluationDto) async throws -> ApiResponse<PeerReviewProgressDto> {
+        let body = SubmitPeerReviewDto(evaluation: evaluation)
+        return try await client.request(
+            path: "/api/peer-review/\(reviewId.uuidString)/submit",
+            method: .post,
+            body: body
+        )
+    }
+
+    func getPeerReviewProgress(taskId: UUID) async throws -> ApiResponse<PeerReviewProgressDto> {
+        return try await client.request(
+            path: "/api/task/\(taskId.uuidString)/peer-review/progress"
+        )
+    }
+
+    func finishPeerReview(taskId: UUID) async throws -> ApiResponse<PeerReviewProgressDto> {
+        return try await client.request(
+            path: "/api/task/\(taskId.uuidString)/peer-review/finish",
+            method: .post
+        )
+    }
 }

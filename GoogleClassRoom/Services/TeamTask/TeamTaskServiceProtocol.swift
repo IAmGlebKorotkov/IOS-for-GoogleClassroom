@@ -13,4 +13,7 @@ protocol TeamTaskServiceProtocol {
     func deleteSelfAssessment(taskId: UUID) async throws -> ApiResponse<IdDto>
     func previewGrade(solutionId: UUID, evaluation: EvaluationDto) async throws -> ApiResponse<GradeBreakdownDto>
     func reviewSolution(solutionId: UUID, score: Int?, status: SolutionStatus, comment: String?, evaluation: EvaluationDto?) async throws -> ApiResponse<IdDto>
+    func getAvailablePeerReviews(taskId: UUID) async throws -> ApiResponse<PeerReviewTeamTargetListDto>
+    func submitTeamPeerReview(teamSolutionId: UUID, evaluation: EvaluationDto) async throws -> ApiResponse<PeerReviewProgressDto>
+    func getTeamPeerReviewProgress(taskId: UUID) async throws -> ApiResponse<PeerReviewProgressDto>
 }

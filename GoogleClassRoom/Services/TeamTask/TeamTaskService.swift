@@ -142,6 +142,27 @@ final class TeamTaskService: TeamTaskServiceProtocol {
         return ApiResponse(type: response.type, message: response.message, data: response.data.map { IdDto(id: $0.id) })
     }
 
+    func getAvailablePeerReviews(taskId: UUID) async throws -> ApiResponse<PeerReviewTeamTargetListDto> {
+        return try await client.request(
+            path: "/api/team-task/\(taskId.uuidString)/peer-review/available"
+        )
+    }
+
+    func submitTeamPeerReview(teamSolutionId: UUID, evaluation: EvaluationDto) async throws -> ApiResponse<PeerReviewProgressDto> {
+        let body = SubmitPeerReviewDto(evaluation: evaluation)
+        return try await client.request(
+            path: "/api/team-solution/\(teamSolutionId.uuidString)/peer-review",
+            method: .post,
+            body: body
+        )
+    }
+
+    func getTeamPeerReviewProgress(taskId: UUID) async throws -> ApiResponse<PeerReviewProgressDto> {
+        return try await client.request(
+            path: "/api/team-task/\(taskId.uuidString)/peer-review/progress"
+        )
+    }
+
     private func createTeam(path: String, name: String) async throws -> ApiResponse<String?> {
         let body = CreateTeamRequestDto(name: name)
         let response: ApiResponse<IgnoredResponseData> = try await client.request(

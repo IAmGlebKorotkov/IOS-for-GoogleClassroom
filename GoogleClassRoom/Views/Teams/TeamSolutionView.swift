@@ -35,6 +35,7 @@ struct TeamSolutionView: View {
                             .frame(maxWidth: .infinity, minHeight: 200)
                     } else if let solution = vm.solution {
                         existingSolutionSection(solution: solution)
+                        peerReviewSection(solution: solution)
                         selfAssessmentSection(solution: solution)
                         distributionButton(solution: solution)
                     } else {
@@ -255,6 +256,39 @@ struct TeamSolutionView: View {
                         .background(Color.red.opacity(0.1))
                         .foregroundStyle(.red)
                         .cornerRadius(12)
+                }
+                .padding(.horizontal)
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func peerReviewSection(solution: StudentTeamSolutionDetailsDto) -> some View {
+        if let progress = solution.peerReviewProgress {
+            VStack(alignment: .leading, spacing: 12) {
+                Divider().padding(.horizontal)
+
+                PeerReviewProgressCard(
+                    title: "P2P-оценивание",
+                    subtitle: progress.isCounted
+                        ? "Командная сдача засчитана для вас"
+                        : "Оцените работу хотя бы одной другой команды",
+                    progress: progress
+                )
+                .padding(.horizontal)
+
+                NavigationLink {
+                    TeamPeerReviewFlowView(taskId: vm.taskId, criteria: criteria)
+                } label: {
+                    Label(
+                        progress.isCounted ? "Посмотреть команды" : "Оценить другую команду",
+                        systemImage: progress.isCounted ? "checkmark.seal.fill" : "person.3.sequence.fill"
+                    )
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(progress.isCounted ? Color.green.opacity(0.15) : Color.indigo)
+                    .foregroundStyle(progress.isCounted ? .green : .white)
+                    .cornerRadius(12)
                 }
                 .padding(.horizontal)
             }
@@ -505,5 +539,200 @@ struct TeamSolutionView: View {
 
     private func formatScore(_ value: Double) -> String {
         value.formatted(.number.precision(.fractionLength(0...2)))
+    }
+}
+
+private struct TeamPeerReviewFlowView: View {
+    @StateObject private var vm: TeamPeerReviewViewModel
+    @State private var weightedScores: [UUID: Double] = [:]
+    @State private var enabledCriteria: Set<UUID> = []
+
+    init(taskId: UUID, criteria: [CriterionDto]) {
+        _vm = StateObject(wrappedValue: TeamPeerReviewViewModel(taskId: taskId, criteria: criteria))
+    }
+
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 18) {
+                if let progress = vm.progress {
+                    PeerReviewProgressCard(
+                        title: "Ваш прогресс",
+                        subtitle: progress.isCounted
+                            ? "Вы оценили другую команду"
+                            : "Нужно оценить одну другую команду",
+                        progress: progress
+                    )
+                }
+
+                if vm.isLoading && vm.targets.isEmpty {
+                    ProgressView()
+                        .frame(maxWidth: .infinity, minHeight: 220)
+                } else if vm.targets.isEmpty {
+                    ContentUnavailableView(
+                        "Нет доступных команд",
+                        systemImage: "person.3",
+                        description: Text("Других команд с отправленным решением пока нет.")
+                    )
+                    .frame(maxWidth: .infinity, minHeight: 220)
+                } else {
+                    targetPicker
+                    selectedTargetDetails
+                    criteriaSection
+                    submitButton
+                }
+
+                if let error = vm.errorMessage {
+                    Text(error)
+                        .font(.caption)
+                        .foregroundStyle(.red)
+                }
+                if let success = vm.successMessage {
+                    Text(success)
+                        .font(.caption)
+                        .foregroundStyle(.green)
+                }
+            }
+            .padding()
+        }
+        .navigationTitle("P2P команды")
+        .navigationBarTitleDisplayMode(.inline)
+        .task {
+            resetEvaluation()
+            await vm.load()
+        }
+        .onChange(of: vm.selectedTarget?.teamSolutionId) {
+            resetEvaluation()
+        }
+    }
+
+    private var targetPicker: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Работа для оценки")
+                .font(.headline)
+            Picker("Команда", selection: Binding(
+                get: { vm.selectedTarget?.teamSolutionId },
+                set: { id in
+                    vm.selectedTarget = vm.targets.first { $0.teamSolutionId == id }
+                }
+            )) {
+                ForEach(vm.targets) { target in
+                    Text(target.teamName ?? "Команда")
+                        .tag(Optional(target.teamSolutionId))
+                }
+            }
+            .pickerStyle(.menu)
+        }
+    }
+
+    @ViewBuilder
+    private var selectedTargetDetails: some View {
+        if let target = vm.selectedTarget {
+            VStack(alignment: .leading, spacing: 10) {
+                Label(target.teamName ?? "Команда", systemImage: "person.3.fill")
+                    .font(.subheadline.bold())
+                Text("Сдано: \(target.submittedAt.formatted(date: .abbreviated, time: .shortened))")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+
+                if let text = target.text, !text.isEmpty {
+                    Text(text)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding()
+                        .background(Color(.systemGray6))
+                        .cornerRadius(10)
+                }
+
+                if let files = target.files, !files.isEmpty {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Файлы")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                        ForEach(files, id: \.id) { file in
+                            teamSolutionFileRow(file: file)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var criteriaSection: some View {
+        if vm.criteria.isEmpty {
+            ContentUnavailableView(
+                "Нет критериев",
+                systemImage: "list.bullet.rectangle",
+                description: Text("Для этого задания не настроены критерии оценивания.")
+            )
+        } else {
+            VStack(alignment: .leading, spacing: 12) {
+                Text("Оценка по критериям")
+                    .font(.headline)
+                CriteriaEvaluationView(
+                    criteria: vm.criteria,
+                    weightedScores: $weightedScores,
+                    enabledCriteria: $enabledCriteria
+                )
+            }
+        }
+    }
+
+    private var submitButton: some View {
+        Button {
+            Task { await vm.submit(evaluation: currentEvaluation) }
+        } label: {
+            Group {
+                if vm.isSubmitting {
+                    ProgressView()
+                } else {
+                    Label("Сохранить оценку", systemImage: "checkmark.circle.fill")
+                        .font(.headline)
+                }
+            }
+            .frame(maxWidth: .infinity)
+            .padding()
+            .background(.indigo)
+            .foregroundStyle(.white)
+            .cornerRadius(12)
+        }
+        .disabled(vm.isSubmitting || vm.selectedTarget == nil || vm.criteria.isEmpty)
+    }
+
+    private var currentEvaluation: EvaluationDto {
+        CriterionCalculator.makeEvaluation(
+            criteria: vm.criteria,
+            weightedScores: weightedScores,
+            toggledCriteria: enabledCriteria
+        )
+    }
+
+    private func resetEvaluation() {
+        weightedScores = Dictionary(
+            uniqueKeysWithValues: vm.criteria
+                .filter { $0.type == .weighted }
+                .map { ($0.id, 0) }
+        )
+        enabledCriteria = Set(vm.criteria.filter { $0.type == .quality }.map(\.id))
+    }
+
+    private func teamSolutionFileRow(file: FileDto) -> some View {
+        Group {
+            if let idStr = file.id, let uuid = UUID(uuidString: idStr),
+               let url = URL(string: "\(APIClient.baseURL)/api/files/\(uuid.uuidString)") {
+                Link(destination: url) {
+                    HStack {
+                        Image(systemName: "doc.fill").foregroundStyle(.blue)
+                        Text(file.name ?? "Файл").font(.subheadline).lineLimit(1).foregroundStyle(.blue)
+                        Spacer()
+                        Image(systemName: "arrow.down.circle").foregroundStyle(.blue)
+                    }
+                }
+            } else {
+                HStack {
+                    Image(systemName: "doc.fill").foregroundStyle(.secondary)
+                    Text(file.name ?? "Файл").font(.subheadline).foregroundStyle(.secondary)
+                }
+            }
+        }
     }
 }

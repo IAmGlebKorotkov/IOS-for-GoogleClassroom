@@ -26,6 +26,8 @@ final class PostService: PostServiceProtocol {
             studentScoreWeight: request.studentScoreWeight,
             penaltyPerDay: request.penaltyPerDay,
             maxDays: request.maxDays,
+            gradingMode: request.gradingMode,
+            minPeerReviewsRequired: request.minPeerReviewsRequired,
             criteria: request.criteria
         )
         let response: ApiResponse<IdRequestDto> = try await client.request(
@@ -64,6 +66,8 @@ final class PostService: PostServiceProtocol {
             studentScoreWeight: request.studentScoreWeight,
             penaltyPerDay: request.penaltyPerDay,
             maxDays: request.maxDays,
+            gradingMode: request.gradingMode,
+            minPeerReviewsRequired: request.minPeerReviewsRequired,
             criteria: request.criteria
         )
         let response: ApiResponse<IdRequestDto> = try await client.request(
@@ -122,5 +126,7 @@ private struct CreateUpdatePostDto: Encodable {
     let studentScoreWeight: Double?
     let penaltyPerDay: Double?
     let maxDays: Int?
+    let gradingMode: GradingMode?
+    let minPeerReviewsRequired: Int?
     let criteria: [CriterionDefinitionDto]?
 }

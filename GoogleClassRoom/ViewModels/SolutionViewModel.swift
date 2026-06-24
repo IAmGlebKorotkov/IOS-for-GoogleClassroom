@@ -156,6 +156,90 @@ final class SolutionViewModel: ObservableObject {
     }
 }
 
+@MainActor
+final class PeerReviewFlowViewModel: ObservableObject {
+    @Published var target: PeerReviewTargetDto?
+    @Published var progress: PeerReviewProgressDto?
+    @Published var isLoading = false
+    @Published var isSubmitting = false
+    @Published var errorMessage: String?
+    @Published var successMessage: String?
+
+    let taskId: UUID
+    private let service: SolutionServiceProtocol
+
+    init(taskId: UUID, service: SolutionServiceProtocol? = nil) {
+        self.taskId = taskId
+        self.service = service ?? ServiceLocator.shared.solutionService
+    }
+
+    func load() async {
+        isLoading = true
+        errorMessage = nil
+        successMessage = nil
+        defer { isLoading = false }
+
+        do {
+            let progressResponse = try await service.getPeerReviewProgress(taskId: taskId)
+            progress = progressResponse.data
+
+            if progressResponse.data?.isCounted == true {
+                target = nil
+                return
+            }
+
+            let targetResponse = try await service.getNextPeerReview(taskId: taskId)
+            target = targetResponse.data
+        } catch let e as APIError {
+            errorMessage = e.localizedDescription
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+
+    func submit(evaluation: EvaluationDto) async {
+        guard let reviewId = target?.reviewId else { return }
+        isSubmitting = true
+        errorMessage = nil
+        successMessage = nil
+        defer { isSubmitting = false }
+
+        do {
+            let response = try await service.submitPeerReview(reviewId: reviewId, evaluation: evaluation)
+            progress = response.data
+            successMessage = "Оценка сохранена"
+            target = nil
+
+            if response.data?.canFinish != true {
+                let targetResponse = try await service.getNextPeerReview(taskId: taskId)
+                target = targetResponse.data
+            }
+        } catch let e as APIError {
+            errorMessage = e.localizedDescription
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+
+    func finish() async {
+        isSubmitting = true
+        errorMessage = nil
+        successMessage = nil
+        defer { isSubmitting = false }
+
+        do {
+            let response = try await service.finishPeerReview(taskId: taskId)
+            progress = response.data
+            target = nil
+            successMessage = "P2P-оценивание завершено"
+        } catch let e as APIError {
+            errorMessage = e.localizedDescription
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+}
+
 extension APIError: Equatable {
     public static func == (lhs: APIError, rhs: APIError) -> Bool {
         switch (lhs, rhs) {

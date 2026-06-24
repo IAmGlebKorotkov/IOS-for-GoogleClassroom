@@ -35,6 +35,7 @@ struct SolutionView: View {
                             .frame(maxWidth: .infinity, minHeight: 200)
                     } else if let solution = vm.solution {
                         currentSolutionSection(solution: solution)
+                        peerReviewSection(solution: solution)
                         selfAssessmentSection(solution: solution)
 
                         if let solutionId = solution.id {
@@ -299,6 +300,39 @@ struct SolutionView: View {
     }
 
     @ViewBuilder
+    private func peerReviewSection(solution: StudentSolutionDetailsDto) -> some View {
+        if let progress = solution.peerReviewProgress {
+            VStack(alignment: .leading, spacing: 12) {
+                Divider().padding(.horizontal)
+
+                PeerReviewProgressCard(
+                    title: "P2P-оценивание",
+                    subtitle: progress.isCounted
+                        ? "Решение засчитано"
+                        : "Оцените работы других студентов, чтобы завершить сдачу",
+                    progress: progress
+                )
+                .padding(.horizontal)
+
+                NavigationLink {
+                    IndividualPeerReviewFlowView(taskId: vm.taskId)
+                } label: {
+                    Label(
+                        progress.isCounted ? "Посмотреть P2P" : "Перейти к оцениванию",
+                        systemImage: progress.isCounted ? "checkmark.seal.fill" : "person.2.wave.2.fill"
+                    )
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(progress.isCounted ? Color.green.opacity(0.15) : Color.indigo)
+                    .foregroundStyle(progress.isCounted ? .green : .white)
+                    .cornerRadius(12)
+                }
+                .padding(.horizontal)
+            }
+        }
+    }
+
+    @ViewBuilder
     private func selfAssessmentSection(solution: StudentSolutionDetailsDto) -> some View {
         if !criteria.isEmpty, selfAssessmentEnabled {
             VStack(alignment: .leading, spacing: 12) {
@@ -478,6 +512,226 @@ struct SolutionView: View {
             return type.preferredMIMEType ?? "application/octet-stream"
         }
         return "application/octet-stream"
+    }
+}
+
+private struct IndividualPeerReviewFlowView: View {
+    @StateObject private var vm: PeerReviewFlowViewModel
+    @State private var weightedScores: [UUID: Double] = [:]
+    @State private var enabledCriteria: Set<UUID> = []
+
+    init(taskId: UUID) {
+        _vm = StateObject(wrappedValue: PeerReviewFlowViewModel(taskId: taskId))
+    }
+
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 18) {
+                if let progress = vm.progress {
+                    PeerReviewProgressCard(
+                        title: "Ваш прогресс",
+                        subtitle: progress.isCounted
+                            ? "Минимум выполнен, сдача засчитана"
+                            : "Нужно выполнить минимум оцениваний",
+                        progress: progress
+                    )
+                }
+
+                if vm.isLoading && vm.target == nil {
+                    ProgressView()
+                        .frame(maxWidth: .infinity, minHeight: 220)
+                } else if let target = vm.target {
+                    targetSection(target)
+                    criteriaSection(for: target)
+                    submitButton
+                } else {
+                    emptyTargetSection
+                }
+
+                finishButton
+
+                if let error = vm.errorMessage {
+                    Text(error)
+                        .font(.caption)
+                        .foregroundStyle(.red)
+                }
+                if let success = vm.successMessage {
+                    Text(success)
+                        .font(.caption)
+                        .foregroundStyle(.green)
+                }
+            }
+            .padding()
+        }
+        .navigationTitle("P2P-оценка")
+        .navigationBarTitleDisplayMode(.inline)
+        .task { await vm.load() }
+        .onChange(of: vm.target?.reviewId) {
+            resetEvaluation()
+        }
+    }
+
+    private func targetSection(_ target: PeerReviewTargetDto) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Label("Анонимное решение", systemImage: "doc.text.magnifyingglass")
+                .font(.headline)
+
+            if let text = target.solution?.text, !text.isEmpty {
+                Text(text)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding()
+                    .background(Color(.systemGray6))
+                    .cornerRadius(10)
+            }
+
+            if let files = target.solution?.files, !files.isEmpty {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Файлы")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    ForEach(files, id: \.id) { file in
+                        SolutionFileRowView(file: file)
+                    }
+                }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func criteriaSection(for target: PeerReviewTargetDto) -> some View {
+        let criteria = sortedCriteria(for: target)
+        if criteria.isEmpty {
+            ContentUnavailableView(
+                "Нет критериев",
+                systemImage: "list.bullet.rectangle",
+                description: Text("Для этого задания не настроены критерии оценивания.")
+            )
+        } else {
+            VStack(alignment: .leading, spacing: 12) {
+                Text("Оценка по критериям")
+                    .font(.headline)
+                CriteriaEvaluationView(
+                    criteria: criteria,
+                    weightedScores: $weightedScores,
+                    enabledCriteria: $enabledCriteria
+                )
+            }
+        }
+    }
+
+    private var submitButton: some View {
+        Button {
+            Task { await vm.submit(evaluation: currentEvaluation) }
+        } label: {
+            Group {
+                if vm.isSubmitting {
+                    ProgressView()
+                } else {
+                    Label("Далее", systemImage: "arrow.right.circle.fill")
+                        .font(.headline)
+                }
+            }
+            .frame(maxWidth: .infinity)
+            .padding()
+            .background(.indigo)
+            .foregroundStyle(.white)
+            .cornerRadius(12)
+        }
+        .disabled(vm.isSubmitting || currentCriteria.isEmpty)
+    }
+
+    @ViewBuilder
+    private var finishButton: some View {
+        if vm.progress?.canFinish == true {
+            Button {
+                Task { await vm.finish() }
+            } label: {
+                Label(
+                    vm.progress?.isCounted == true ? "Оценивание завершено" : "Завершить оценивание",
+                    systemImage: "checkmark.seal.fill"
+                )
+                .font(.headline)
+                .frame(maxWidth: .infinity)
+                .padding()
+                .background(Color.green.opacity(0.15))
+                .foregroundStyle(.green)
+                .cornerRadius(12)
+            }
+            .disabled(vm.isSubmitting || vm.progress?.isCounted == true)
+        }
+    }
+
+    private var emptyTargetSection: some View {
+        ContentUnavailableView(
+            "Нет доступных работ",
+            systemImage: "tray",
+            description: Text("Если минимум уже выполнен, можно завершить оценивание.")
+        )
+        .frame(maxWidth: .infinity, minHeight: 220)
+    }
+
+    private var currentCriteria: [CriterionDto] {
+        guard let target = vm.target else { return [] }
+        return sortedCriteria(for: target)
+    }
+
+    private var currentEvaluation: EvaluationDto {
+        CriterionCalculator.makeEvaluation(
+            criteria: currentCriteria,
+            weightedScores: weightedScores,
+            toggledCriteria: enabledCriteria
+        )
+    }
+
+    private func sortedCriteria(for target: PeerReviewTargetDto) -> [CriterionDto] {
+        (target.criteria ?? []).sorted { $0.orderIndex < $1.orderIndex }
+    }
+
+    private func resetEvaluation() {
+        let criteria = currentCriteria
+        weightedScores = Dictionary(
+            uniqueKeysWithValues: criteria
+                .filter { $0.type == .weighted }
+                .map { ($0.id, 0) }
+        )
+        enabledCriteria = Set(criteria.filter { $0.type == .quality }.map(\.id))
+    }
+}
+
+struct PeerReviewProgressCard: View {
+    let title: String
+    let subtitle: String
+    let progress: PeerReviewProgressDto
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(alignment: .top) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(title)
+                        .font(.headline)
+                    Text(subtitle)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                Spacer()
+                Image(systemName: progress.isCounted ? "checkmark.seal.fill" : "person.2.wave.2.fill")
+                    .foregroundStyle(progress.isCounted ? .green : .indigo)
+            }
+
+            ProgressView(value: Double(min(progress.completed, progress.required)), total: Double(max(progress.required, 1)))
+                .tint(progress.isCounted ? .green : .indigo)
+
+            HStack {
+                Label("\(progress.completed)/\(progress.required)", systemImage: "checklist")
+                Spacer()
+                Text(progress.isCounted ? "Засчитано" : (progress.canFinish ? "Можно завершить" : "В процессе"))
+            }
+            .font(.caption)
+            .foregroundStyle(.secondary)
+        }
+        .padding()
+        .background(Color(.secondarySystemBackground))
+        .cornerRadius(12)
     }
 }
 

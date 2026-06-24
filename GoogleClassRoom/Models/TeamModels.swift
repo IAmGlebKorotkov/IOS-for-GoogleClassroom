@@ -29,6 +29,7 @@ struct StudentTeamSolutionDetailsDto: Codable {
     var selfAssessments: [MemberSelfAssessmentDto]? = nil
     var teacherEvaluation: EvaluationDto? = nil
     var breakdown: GradeBreakdownDto? = nil
+    var peerReviewProgress: PeerReviewProgressDto? = nil
 }
 
 struct TeamSolutionListItemDto: Codable, Identifiable {
@@ -43,6 +44,22 @@ struct TeamSolutionListItemDto: Codable, Identifiable {
 
 struct TeamSolutionListDto: Codable {
     let records: [TeamSolutionListItemDto]
+    let totalRecords: Int
+}
+
+struct PeerReviewTeamTargetDto: Codable, Identifiable, Hashable {
+    let teamSolutionId: UUID
+    let teamName: String?
+    let submittedAt: Date
+    let alreadyReviewed: Bool
+    let text: String?
+    let files: [FileDto]?
+
+    var id: UUID { teamSolutionId }
+}
+
+struct PeerReviewTeamTargetListDto: Codable {
+    let records: [PeerReviewTeamTargetDto]
     let totalRecords: Int
 }
 
